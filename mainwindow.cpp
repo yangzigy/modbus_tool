@@ -50,12 +50,13 @@ void MainWindow::ui_initial()
 	chart0->setMargins(tmpmarg);
 	chartView0 = new QChartView(chart0);
 
-	timerid=startTimer(100); //初始化定时器
+	timerid=startTimer(10); //初始化定时器
 }
-void MainWindow::timerEvent(QTimerEvent *event) //10Hz
+void MainWindow::timerEvent(QTimerEvent *event) //100Hz
 {
 	if(event->timerId() == timerid) //定时器调用，或触发
 	{
+		md_master.poll();
 	}
 }
 
@@ -70,6 +71,7 @@ void MainWindow::slot_uart_rx() //串口接收
 	while(n)
 	{
 		n=uart->read(buf,sizeof(buf));
+		md_master.pack((u8*)buf,n);
 	}
 }
 void MainWindow::uart_rxpro_slot(int type) //uart接收处理

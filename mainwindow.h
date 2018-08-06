@@ -13,8 +13,10 @@
 #include "qserialportinfo.h"
 #include "json.h"
 #include "common.h"
+#include "modbus.h"
 
 extern Json::Value config; //配置对象
+extern CModbus_Master md_master;
 
 namespace Ui {
 class MainWindow;
@@ -55,11 +57,13 @@ class CModbus_RegDis //modbus寄存器显示
 {
 public:
 	CModbus_RegDis(){}
-	string name; //寄存器名称
-	u16 addr; //寄存器地址
-	int type; //显示类型,0:原始码，1:0.1,2:0.01,3:0.001,4:0.0001,5:0.00001,6~11为有符号数
-	int rw; //0读1写
+	string name=""; //寄存器名称
+	u16 addr=0; //寄存器地址
+	int type=0; //显示类型,0:原始码，1:0.1,2:0.01,3:0.001,4:0.0001,5:0.00001,6~11为有符号数
+	int rw=0; //0读1写
+	int interval=0; //读寄存器间隔
+	int is_dis_chart=0; //是否显示图
 };
 
-
 #endif // MAINWINDOW_H
+

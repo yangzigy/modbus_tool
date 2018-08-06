@@ -17,26 +17,29 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>robot control</string>
+   <string>modbus display</string>
   </property>
   <property name="styleSheet">
    <string notr="true">*{font: 18px;}</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QGridLayout" name="gridLayout_2">
+   <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,1,0" rowminimumheight="0,0,0">
     <property name="leftMargin">
-     <number>4</number>
+     <number>3</number>
     </property>
     <property name="topMargin">
-     <number>4</number>
+     <number>3</number>
     </property>
     <property name="rightMargin">
-     <number>4</number>
+     <number>3</number>
     </property>
     <property name="bottomMargin">
      <number>3</number>
     </property>
-    <item row="0" column="2" rowspan="2">
+    <property name="spacing">
+     <number>3</number>
+    </property>
+    <item row="0" column="1" rowspan="3">
      <widget class="QScrollArea" name="scrollArea">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
@@ -67,8 +70,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>316</width>
-         <height>666</height>
+         <width>318</width>
+         <height>692</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout_3">
@@ -87,8 +90,77 @@
         <property name="spacing">
          <number>3</number>
         </property>
+        <item row="3" column="0" colspan="3">
+         <widget class="QWidget" name="widget_writereg" native="true">
+          <layout class="QGridLayout" name="gridLayout_4">
+           <property name="leftMargin">
+            <number>3</number>
+           </property>
+           <property name="topMargin">
+            <number>3</number>
+           </property>
+           <property name="rightMargin">
+            <number>3</number>
+           </property>
+           <property name="bottomMargin">
+            <number>3</number>
+           </property>
+           <property name="spacing">
+            <number>3</number>
+           </property>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_3">
+             <property name="text">
+              <string>写寄存器</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="6" column="1">
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
         <item row="1" column="0" colspan="3">
-         <widget class="QLabel" name="label_19">
+         <widget class="QWidget" name="widget_read_reg" native="true">
+          <layout class="QGridLayout" name="gridLayout">
+           <property name="leftMargin">
+            <number>3</number>
+           </property>
+           <property name="topMargin">
+            <number>3</number>
+           </property>
+           <property name="rightMargin">
+            <number>3</number>
+           </property>
+           <property name="bottomMargin">
+            <number>3</number>
+           </property>
+           <property name="spacing">
+            <number>3</number>
+           </property>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label">
+             <property name="text">
+              <string>读寄存器</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="2" column="0" colspan="3">
+         <widget class="QLabel" name="label_2">
           <property name="maximumSize">
            <size>
             <width>16777215</width>
@@ -106,49 +178,76 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="2">
-         <widget class="QComboBox" name="cb_baud"/>
-        </item>
-        <item row="3" column="1">
-         <spacer name="verticalSpacer">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="0" column="0">
-         <widget class="QPushButton" name="bt_open_uart">
-          <property name="text">
-           <string>打开串口</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QComboBox" name="cb_uart"/>
-        </item>
        </layout>
       </widget>
      </widget>
     </item>
-    <item row="0" column="0" colspan="2">
-     <widget class="QWidget" name="widget" native="true">
+    <item row="0" column="0">
+     <widget class="QWidget" name="widget_ctrl" native="true">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_5">
+       <item row="0" column="0">
+        <widget class="QPushButton" name="bt_open_uart">
+         <property name="text">
+          <string>打开串口</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QComboBox" name="cb_uart"/>
+       </item>
+       <item row="0" column="2">
+        <widget class="QComboBox" name="cb_baud"/>
+       </item>
+       <item row="0" column="3">
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QWidget" name="widget" native="true">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>100</height>
+       </size>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QWidget" name="widget_2" native="true">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>30</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>30</height>
+       </size>
       </property>
      </widget>
     </item>
    </layout>
   </widget>
-  <widget class="QStatusBar" name="statusBar"/>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>
