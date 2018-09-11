@@ -37,13 +37,29 @@ MainWindow::~MainWindow()
 void MainWindow::ui_initial()
 {
 	//读配置文件，取得多少个写寄存器，多少个读寄存器
-	for(auto &it:config)
+	if(!config["datalist"].isArray())
+	{
+		return ;
+	}
+	if(!config["tasklist"].isArray())
+	{
+		return ;
+	}
+	for(auto &it:config["datalist"])
 	{
 		CModbus_RegDis *pt=new CModbus_RegDis();
-		pt->addr=it.get("addr",0).asInt();
-		pt->name=it.get("name",QString().sprintf("%04X",pt->addr).toStdString().c_str()).asString();
-		pt->type=it.get("type",0).asInt();
-		pt->rw=it.get("rw",0).asInt();
+		pt->name=it.get("name",QString().sprintf("%04X",pt->reg).toStdString().c_str()).asString();
+		pt->addr=it.get("addr",1).asInt();
+		pt->reg=it.get("reg",0).asInt();
+		pt->data_type=it.get("data_type",0).asInt();
+		pt->data_factor=it.get("data_factor",1.0).asDouble();
+		pt->data_offset=it.get("data_offset",0.0).asDouble();
+		pt->display_type=it.get("display_type",0).asInt();
+	}
+	for(auto &it:config["tasklist"])
+	{
+		CModbus_RegDis *pt=new CModbus_RegDis();
+		pt->name=it.get("name","").asString();
 	}
 	chart0 = new QChart();
 	QMargins tmpmarg(5,5,5,5);

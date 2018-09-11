@@ -58,11 +58,19 @@ class CModbus_RegDis //modbus寄存器显示
 public:
 	CModbus_RegDis(){}
 	string name=""; //寄存器名称
-	u16 addr=0; //寄存器地址
-	int type=0; //显示类型,0:原始码，1:0.1,2:0.01,3:0.001,4:0.0001,5:0.00001,6~11为有符号数
-	int rw=0; //0读1写
-	int interval=0; //读寄存器间隔
-	int is_dis_chart=0; //是否显示图
+	u8 addr=0; //地址
+	u16 reg=0; //寄存器地址
+	int data_type=0; //显示类型,0:原始码，1:u16,2:s16,3:u8,4:s8
+	float data_factor=1;
+	float data_offset=0;
+	int display_type=0; //0:十进制,1:HEX,2:float
+};
+class CModbus_TaskList //modbus通信对象
+{
+public:
+	CModbus_RegComm(){}
+	string name=""; //通信对象名
+	MODBUS_ADDR_LIST tl; //任务列表
 };
 
 #endif // MAINWINDOW_H

@@ -1,0 +1,10 @@
+{
+	"datalist":
+	[
+		{"addr":2,"reg":1,"name":"温度",""}
+	],
+	"tasklist":
+	[
+		{"addr":2,"reg":1,"name":"温度",""}
+	]
+}

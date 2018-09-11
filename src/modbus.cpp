@@ -166,10 +166,6 @@ void CModbus_Master::poll(void) //周期函数，主机通过周期函数进行�
 {
 	MODBUS_ADDR_LIST *tmp=addr_list;
 	MODBUS_ADDR_LIST *psend=0;
-	//先清空接收变量
-	pre_p=0;
-	pre_offset=2;
-	pack_len=8;
 	while(tmp) //对于每一个任务
 	{
 		if(tmp->freq==0) //若是单次任务
@@ -204,6 +200,8 @@ void CModbus_Master::poll(void) //周期函数，主机通过周期函数进行�
 		psend->tick=1;
 		host_send(psend->addr,psend->type,psend->st,psend->num,psend->buf);
 		psend->stat=1;
+		//先清空接收变量
+		pre_p=0;
 	}
 	
 	cur_send=psend;
