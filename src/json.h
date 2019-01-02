@@ -2132,6 +2132,7 @@ JSON_API JSONCPP_OSTREAM& operator<<(JSONCPP_OSTREAM&, const Value& root);
 
 void pjson(Json::Value &v);
 int jsonget(Json::Value &v,const char *key,double &o); //获得一个值，没有就不改变
+int jsonget(Json::Value &v,const char *key,float &o); //获得一个值，没有就不改变
 int jsonget(Json::Value &v,const char *key,int &o); //获得一个值，没有就不改变
 int jsonget(Json::Value &v,const char *key,bool &o); //获得一个值，没有就不改变
 int jsonget(Json::Value &v,const char *key,std::string &o); //获得一个值，没有就不改变

@@ -1,15 +1,13 @@
 /*
 文件名：common.cpp
 作者：北京交通大学 自控1102 杨孜
-时间：2014-4-16
-功能：
+创建时间：2014-4-16
+版本：	V1.0			2018-11-21 13:56:31
 
 */
 #include "common.h"
 #include <stdarg.h>
 #include <errno.h>
-
-using namespace std;
 
 ///////////////////////////////////////////////////////////////////
 //1、时间与系统兼容
@@ -43,7 +41,6 @@ int strncasecmp(const char *s1, const char *s2,int n)
 		s2++;
 	}
 }
-
 #endif
 #if (defined(WIN32) || defined(WIN64))
 const char * strp_weekdays[] = 
@@ -343,7 +340,6 @@ void com_debug_ini(string s) //系统日志对象的初始化
 }
 ///////////////////////////////////////////////////////////////////
 //3、字符扩展
-
 //字符串替换功能
 string com_replace(string &str,char target,char src)
 {
@@ -541,7 +537,6 @@ void CFilePath::operator =(string s)
 
 ///////////////////////////////////////////////////////////////////
 //4、安全跨平台文件访问
-
 //获取文件长度
 s64 get_file_size(FILE* fp)//获取文件长度
 {
@@ -656,7 +651,6 @@ s64 CComFile::write(void *p,u64 n)
 	}
 	return real_n;
 }
-
 //离线处理函数,将一个文件以缓冲的方式分批读入
 //并调用回调函数进行处理。回调函数中指名当前调用者的数据
 void offline_pro(CComFile &file,u64 st,u64 end,u64 bufn,
@@ -740,53 +734,6 @@ string com_popen(const char *scmd)//打开只读管道获取命令输出
 	return s;
 }
 
-#ifdef WIN32
-int _system (const char *command) //不复制内存的调用方式
-{
-	return system(command);
-}
-#else
-#include <sys/wait.h>
-int _system (const char *command) //不复制内存的调用方式
-{
-	int pid = 0;
-	int status = 0;
-	char *argv[4];
-	extern char **environ;
-	if(NULL==command)
-	{
-		return -1;
-	}
-	pid = vfork();
-	if(pid<0)
-	{
-		return -1;
-	}
-	if(0==pid)
-	{             /* child process */
-		argv[0] = "sh";
-		argv[1] = "-c";
-		argv[2] = (char*)command;
-		argv[3] = NULL;
-		execve("/bin/sh",argv,environ);    /* execve() also an implementation of exec() */
-		exit(127);
-	}
-	/* wait for child process to start */
-	do
-	{
-		if(waitpid(pid,&status,0)<0)
-		{
-			//if(errno!=EINTR) { return -1; } else { return status;}
-			if(status!=0)
-			{
-				print_error("");
-			}
-			return status;
-		}
-	} while(1);
-	return 0;
-}
-#endif
 ///////////////////////////////////////////////////////////////////
 //6、python扩展
 #ifdef PYEXT

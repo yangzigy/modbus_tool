@@ -1,11 +1,10 @@
 /*
 文件名：main.h
-时间：21:39 2011-1-28
+创建时间：21:39 2011-1-28
+版本：	V1.0			2018-11-21 13:56:31
 
 功能：
-
 定义全局宏
-
 */
 #ifndef MAIN_H
 #define MAIN_H
@@ -33,6 +32,11 @@
 using namespace std;
 #endif
 
+#define GCC_VERSION (__GNUC__ * 10000 \
+                     + __GNUC_MINOR__ * 100 \
+                     + __GNUC_PATCHLEVEL__)
+//#if GCC_VERSION > 30200 //GCC > 3.2.0
+
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef unsigned int u32;
@@ -56,20 +60,17 @@ typedef volatile signed long long vs64;
 typedef unsigned long long t_maxu; //最大的整形
 typedef signed long long t_maxs;
 
-#define _DEBUG
-#define _DBG_STDOUT
-
 //定义精度误差
 #define Eps	(1e-6)
 
 #define TEST_ASSERT(x,y,exp)	cout<<endl;\
-						if(exp)\
-							cout<<__FILE__<<':'<<__LINE__<<": passed";\
-						else \
-						{\
-							cout<<__FILE__<<':'<<__LINE__<<": failed";\
-							cout<<" exp:"<<x<<",ect:"<<y;\
-						} cout<<"\t"
+					if(exp)\
+						cout<<__FILE__<<':'<<__LINE__<<":\033[32m passed\033[0m";\
+					else \
+					{\
+						cout<<__FILE__<<':'<<__LINE__<<":\033[31m failed";\
+						cout<<" exp:"<<x<<",ect:"<<y;\
+					} cout<<"\033[0m\t"
 #define TEST_EQ(x,y)	TEST_ASSERT(x,y,x==y)
 #define TEST_FEQ(x,y)	TEST_ASSERT(x,y,fabs(x-y)<Eps) //浮点数的等于
 #define TEST_NEAR(x,y,e)	TEST_ASSERT(x,y,fabs(x-y)<e)
@@ -79,13 +80,13 @@ typedef signed long long t_maxs;
 #define TEST_GTEQ(x,y)	TEST_ASSERT(x,y,x>=y)
 
 #define CHECK_ASSERT(x,y,exp)	\
-						if(exp){}\
-						else \
-						{\
-							cout<<endl;\
-							cout<<__FILE__<<':'<<__LINE__<<": failed";\
-							cout<<" exp:"<<x<<",ect:"<<y<<"\t";\
-						}
+					if(exp){}\
+					else \
+					{\
+						cout<<endl;\
+						cout<<__FILE__<<':'<<__LINE__<<":\033[31m failed\033[0m";\
+						cout<<" exp:"<<x<<",ect:"<<y<<"\033[0m\t";\
+					}
 #define CHECK_EQ(x,y)	CHECK_ASSERT(x,y,x==y)
 #define CHECK_FEQ(x,y)	CHECK_ASSERT(x,y,fabs(x-y)<Eps) //浮点数的等于
 #define CHECK_NEAR(x,y,e)	CHECK_ASSERT(x,y,fabs(x-y)<e)
@@ -94,6 +95,7 @@ typedef signed long long t_maxs;
 #define CHECK_LTEQ(x,y)	CHECK_ASSERT(x,y,x<=y)
 #define CHECK_GTEQ(x,y)	CHECK_ASSERT(x,y,x>=y)
 
+//定义字节数量
 #define KB(x)	(1024*x)
 #define MB(x)	(1024*1024ll*x)
 #define GB(x)	(1024*1024ll*1024*x)
@@ -106,6 +108,10 @@ typedef signed long long t_maxs;
 				(((n)&0x0000000000ff0000)<<24) | (((n)&0x00000000ff000000)<<8) | \
 				(((n)&0x000000ff00000000)>>8) | (((n)&0x0000ff0000000000)>>24) | \
 				(((n)&0x00ff000000000000)>>40) | (((n)&0xff00000000000000)>>56) )
+
+//数值工具
+#define MINMAX(d,min,max) if((d)<(min)) (d)=(min); else if((d)>(max)) (d)=(max);
+#define PDBG	 printf("%s:%d\n",__FILE__,__LINE__)
 
 #endif
 

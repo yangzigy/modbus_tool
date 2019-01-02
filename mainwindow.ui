@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1300</width>
-    <height>700</height>
+    <width>1000</width>
+    <height>600</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>1300</width>
-    <height>700</height>
+    <width>1000</width>
+    <height>600</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -57,332 +57,206 @@
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
+      <property name="minimumSize">
+       <size>
+        <width>400</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>400</width>
+        <height>16777215</height>
+       </size>
+      </property>
       <layout class="QGridLayout" name="gridLayout_5">
-       <item row="0" column="2">
+       <property name="leftMargin">
+        <number>3</number>
+       </property>
+       <property name="topMargin">
+        <number>3</number>
+       </property>
+       <property name="rightMargin">
+        <number>3</number>
+       </property>
+       <property name="bottomMargin">
+        <number>3</number>
+       </property>
+       <property name="spacing">
+        <number>3</number>
+       </property>
+       <item row="0" column="1">
+        <widget class="QComboBox" name="cb_uart"/>
+       </item>
+       <item row="0" column="0">
         <widget class="QPushButton" name="bt_open_uart">
          <property name="text">
           <string>打开串口</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="4">
-        <widget class="QComboBox" name="cb_baud"/>
-       </item>
-       <item row="0" column="3">
-        <widget class="QComboBox" name="cb_uart"/>
-       </item>
-       <item row="3" column="4">
-        <widget class="QPushButton" name="pushButton_5">
+       <item row="2" column="0">
+        <widget class="QPushButton" name="bt_start_task">
          <property name="text">
-          <string>清除数据</string>
+          <string>开始周期任务</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="2">
-        <widget class="QCheckBox" name="checkBox">
-         <property name="text">
-          <string>记录接收数据</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="3">
-        <widget class="QCheckBox" name="checkBox_2">
-         <property name="text">
-          <string>显示原始数据</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="2">
+       <item row="2" column="1">
         <widget class="QPushButton" name="bt_fitscreen">
          <property name="text">
           <string>适应屏幕</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="2" colspan="3">
-        <widget class="QTextEdit" name="textEdit"/>
+       <item row="0" column="2">
+        <widget class="QComboBox" name="cb_baud"/>
        </item>
-       <item row="2" column="2" colspan="3">
-        <widget class="QWidget" name="widget_replay" native="true">
+       <item row="5" column="0" colspan="3">
+        <widget class="QTextEdit" name="te_comm_log"/>
+       </item>
+       <item row="2" column="2">
+        <widget class="QPushButton" name="pushButton_5">
+         <property name="text">
+          <string>清除数据</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0" colspan="3">
+        <widget class="QGroupBox" name="groupBox">
          <property name="minimumSize">
           <size>
            <width>0</width>
-           <height>100</height>
+           <height>50</height>
           </size>
          </property>
-         <layout class="QGridLayout" name="gridLayout_4" columnstretch="1,1,1">
-          <property name="leftMargin">
-           <number>3</number>
-          </property>
-          <property name="topMargin">
-           <number>3</number>
-          </property>
-          <property name="rightMargin">
-           <number>3</number>
-          </property>
-          <property name="spacing">
-           <number>3</number>
-          </property>
-          <item row="1" column="2">
-           <widget class="QSpinBox" name="spin_replay"/>
-          </item>
-          <item row="1" column="0" colspan="2">
-           <widget class="QSlider" name="hs_replay">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="tickPosition">
-             <enum>QSlider::TicksAbove</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1" colspan="2">
-           <widget class="QProgressBar" name="prog_replay">
-            <property name="value">
-             <number>24</number>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="2">
-           <widget class="QLabel" name="lb_total_frame">
+         <property name="title">
+          <string>单次发送</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_4">
+          <item row="5" column="0">
+           <widget class="QRadioButton" name="radioButton_2">
             <property name="text">
-             <string>总帧数：</string>
+             <string>读保持寄存器</string>
             </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="QPushButton" name="bt_replay_interval">
-            <property name="text">
-             <string>回放间隔(ms)</string>
+            <property name="checked">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
           <item row="3" column="0">
-           <widget class="QLineEdit" name="le_replay_interval">
+           <widget class="QRadioButton" name="radioButton_4">
+            <property name="text">
+             <string>写多寄存器</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="lineEdit">
             <property name="text">
              <string>1</string>
             </property>
            </widget>
           </item>
-          <item row="4" column="0" colspan="3">
-           <widget class="QWidget" name="widget_2" native="true">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>50</height>
-             </size>
+          <item row="0" column="2">
+           <widget class="QPushButton" name="pushButton_6">
+            <property name="text">
+             <string>发送</string>
             </property>
-            <layout class="QGridLayout" name="gridLayout">
-             <item row="0" column="4">
-              <widget class="QPushButton" name="bt_replay_end">
-               <property name="minimumSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset resource="img.qrc">
-                 <normaloff>:/img/5.PNG</normaloff>:/img/5.PNG</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="2">
-              <widget class="QPushButton" name="bt_replay_play">
-               <property name="minimumSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset resource="img.qrc">
-                 <normaloff>:/img/3.PNG</normaloff>
-                 <normalon>:/img/3.1.PNG</normalon>:/img/3.PNG</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-               <property name="checkable">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="0">
-              <widget class="QPushButton" name="bt_replay_home">
-               <property name="minimumSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset resource="img.qrc">
-                 <normaloff>:/img/1.PNG</normaloff>:/img/1.PNG</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <widget class="QPushButton" name="bt_replay_slow">
-               <property name="minimumSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset resource="img.qrc">
-                 <normaloff>:/img/2.PNG</normaloff>:/img/2.PNG</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="3">
-              <widget class="QPushButton" name="bt_replay_speedup">
-               <property name="minimumSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset resource="img.qrc">
-                 <normaloff>:/img/4.PNG</normaloff>:/img/4.PNG</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="5">
-              <widget class="QPushButton" name="bt_replay_circle">
-               <property name="minimumSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset resource="img.qrc">
-                 <normaloff>:/img/6.PNG</normaloff>
-                 <normalon>:/img/6.1.PNG</normalon>:/img/6.PNG</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-               <property name="checkable">
-                <bool>true</bool>
-               </property>
-               <property name="checked">
-                <bool>false</bool>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="6">
-              <widget class="QLabel" name="lb_replay_v">
-               <property name="text">
-                <string>X1  </string>
-               </property>
-              </widget>
-             </item>
-            </layout>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLabel" name="label_4">
+            <property name="text">
+             <string>数量</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="0">
+           <widget class="QRadioButton" name="radioButton_3">
+            <property name="text">
+             <string>读输入寄存器</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="lineEdit_2">
+            <property name="text">
+             <string>0</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>地址</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="2">
+           <widget class="QLineEdit" name="lineEdit_5">
+            <property name="text">
+             <string>2</string>
+            </property>
            </widget>
           </item>
           <item row="2" column="0">
-           <widget class="QLabel" name="lb_replay_stat">
+           <widget class="QRadioButton" name="radioButton">
             <property name="text">
-             <string>回放状态</string>
+             <string>写单寄存器</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_2">
+            <property name="text">
+             <string>寄存器</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLabel" name="label_3">
+            <property name="text">
+             <string>值</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="2">
+           <widget class="QLineEdit" name="lineEdit_3">
+            <property name="text">
+             <string>00</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="2">
+           <widget class="QLineEdit" name="lineEdit_4">
+            <property name="text">
+             <string>1</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="QLabel" name="label_5">
+            <property name="text">
+             <string>数量</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="label_6">
+            <property name="text">
+             <string>数据</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1" colspan="2">
+           <widget class="QLineEdit" name="lineEdit_6">
+            <property name="text">
+             <string>00 00</string>
             </property>
            </widget>
           </item>
          </layout>
-        </widget>
-       </item>
-       <item row="1" column="3">
-        <widget class="QPushButton" name="bt_replay">
-         <property name="text">
-          <string>回放</string>
-         </property>
         </widget>
        </item>
       </layout>
@@ -394,7 +268,7 @@
        <string>registers</string>
       </property>
       <layout class="QGridLayout" name="gridLayout">
-       <item row="1" column="2">
+       <item row="1" column="1">
         <widget class="QPushButton" name="pushButton_2">
          <property name="text">
           <string>-</string>
@@ -421,7 +295,7 @@
          </property>
         </spacer>
        </item>
-       <item row="0" column="0" colspan="3">
+       <item row="0" column="0" colspan="2">
         <widget class="QTableWidget" name="tableWidget"/>
        </item>
       </layout>
@@ -440,7 +314,7 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="0" colspan="3">
+       <item row="0" column="0" colspan="2">
         <widget class="QTableWidget" name="tableWidget_2"/>
        </item>
        <item row="1" column="0">
@@ -456,7 +330,7 @@
          </property>
         </spacer>
        </item>
-       <item row="1" column="2">
+       <item row="1" column="1">
         <widget class="QPushButton" name="pushButton_3">
          <property name="text">
           <string>-</string>
@@ -470,24 +344,6 @@
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources>
-  <include location="img.qrc"/>
- </resources>
+ <resources/>
  <connections/>
- <slots>
-  <slot>bt_replay_click()</slot>
-  <slot>bt_clear_track_click()</slot>
-  <slot>bt_clear_trace_click()</slot>
-  <slot>bt_import_track_click()</slot>
-  <slot>bt_save_track_click()</slot>
-  <slot>bt_add_cur_click()</slot>
-  <slot>bt_add_track_click()</slot>
-  <slot>bt_connect_click()</slot>
-  <slot>bt_send_cmd_click()</slot>
-  <slot>bt_send_track_click()</slot>
-  <slot>bt_stop_task_click()</slot>
-  <slot>bt_save_map_click()</slot>
-  <slot>bt_import_map_click()</slot>
-  <slot>bt_get_roadsign_click()</slot>
- </slots>
 </ui>

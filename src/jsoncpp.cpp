@@ -5250,6 +5250,15 @@ int jsonget(Json::Value &v,const char *key,double &o) //获得一个值，没有
 	}
 	return 1;
 }
+int jsonget(Json::Value &v,const char *key,float &o) //获得一个值，没有就不改变
+{
+	if(v[key].isDouble())
+	{
+		o=v[key].asFloat();
+		return 0;
+	}
+	return 1;
+}
 int jsonget(Json::Value &v,const char *key,int &o) //获得一个值，没有就不改变
 {
 	if(v[key].isInt())

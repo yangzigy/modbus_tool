@@ -1,7 +1,8 @@
 /*
 文件名：common.h
 作者：北京交通大学 自控1102 杨孜
-时间：2014-4-16
+创建时间：2014-4-16
+版本：	V1.0			2018-11-21 14:04:37
 功能：
 	C++常用功能夸平台库，32位、64位的windows与linux
 	1、时间功能
@@ -15,11 +16,9 @@
 #define COMMON_H
 
 #include "main.h"
-using namespace std;
 
 /////////////////////////////////////////////////////////////////////////////////
 //跨平台定义
-
 #if (!defined(WIN32) && !defined(WIN64))
 	#define PATH_CHAR	'/'
 	#define PATH_CHAR_OTHER	'\\'
@@ -60,10 +59,8 @@ int strcasecmp(const char *s1, const char *s2);
 
 #endif
 
-
 /////////////////////////////////////////////////////////////////////////////////
 //1、时间功能
-
 void delay(int ms);
 u32 com_time_getms(void);//通用的获得当前ms计数的函数
 
@@ -401,7 +398,6 @@ void com_debug_ini(string s);
 
 /////////////////////////////////////////////////////////////////////////////////
 //3、字符扩展
-
 void com_strLower(string &s);
 void com_strLower(char *s);
 string com_trim(string &s);//去除首尾空格
@@ -437,13 +433,12 @@ public:
 
 /////////////////////////////////////////////////////////////////////////////////
 //4、安全跨平台文件访问
-
 s64 get_file_size(FILE* fp);//获取文件长度
 FILE *com_fopen(const char *s,const char *flag);
 //调用shell
 void print_error(const char *name);//输出错误信息
 string com_popen(const char *scmd);//打开只读管道获取命令输出
-int _system (const char *command); //不复制内存的调用方式
+int _system(const char *command); //不复制内存的调用方式
 
 class CComFile
 {
@@ -471,9 +466,9 @@ void offline_pro(CComFile &file,u64 st,u64 end,u64 bufn,
 
 //读取文本文件
 string read_textfile(const char *filename);
+
 /////////////////////////////////////////////////////////////////////////////////
 //5、数值工具
-
 template<typename T>
 T com_limit(T d,T min,T max) //限制极值
 {
