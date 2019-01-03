@@ -5,7 +5,6 @@
 MainWindow *pw=0;
 Json::Value config; //配置对象
 
-CModbus_Master md_master;
 /*
 MODBUS_ADDR_LIST md_task_read= //主机任务
 {//起始地址,此数组中地址个数,数据缓存,next
@@ -29,7 +28,7 @@ void modbus_send_uart(u8 *p,int n)
 ///////////////////////////////////////////////////////////////////////
 int main(int argc, char *argv[])
 {
-	md_master.send_fun=modbus_send_uart;
+	main_md.send_fun=modbus_send_uart;
 
     QApplication a(argc, argv);
 // # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -40,11 +39,12 @@ int main(int argc, char *argv[])
 	Json::Reader reader;
 	reader.parse(text.c_str(),config,false); //可以有注释,false不会复制
 	pjson(config); //输出配置字符
-    MainWindow w;
-    w.show();
+	MainWindow w;
+	w.show();
 	pw=&w;
 // # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-//UI逻辑初始化
+//初始化
+	app_ini(config);
 	pw->ui_initial();
 // # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 //主循环

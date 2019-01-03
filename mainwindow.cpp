@@ -36,30 +36,87 @@ MainWindow::~MainWindow()
 
 void MainWindow::ui_initial()
 {
-	//读配置文件，取得多少个写寄存器，多少个读寄存器
-	if(!config["datalist"].isArray())
+	ui->tw_regs->setColumnCount(9);
+	ui->tw_regs->setRowCount(regs_list.size());
+	ui->tw_regs->setHorizontalHeaderLabels(QStringList() <<
+		"名称"<<"原始值"<<"值"<<"地址"<<"寄存器"<<"曲线"<<"类型"<<"系数"<<"偏移");
+	ui->tw_regs->setColumnWidth(0,60);
+	ui->tw_regs->setColumnWidth(1,60);
+	ui->tw_regs->setColumnWidth(2,60);
+	ui->tw_regs->setColumnWidth(3,40);
+	ui->tw_regs->setColumnWidth(4,50);
+	ui->tw_regs->setColumnWidth(5,35);
+	ui->tw_regs->setColumnWidth(6,50);
+	ui->tw_regs->setColumnWidth(7,50);
+	ui->tw_regs->setColumnWidth(8,50);
+	ui->tw_tasks->setColumnCount(6);
+	ui->tw_tasks->setRowCount(regs_list.size());
+	ui->tw_tasks->setHorizontalHeaderLabels(QStringList() <<
+		"名称" << "地址" << "寄存器" << "类型"<<"数量"<<"状态");
+	ui->tw_tasks->setColumnWidth(0,60);
+	ui->tw_tasks->setColumnWidth(1,40);
+	ui->tw_tasks->setColumnWidth(2,50);
+	ui->tw_tasks->setColumnWidth(3,40);
+	ui->tw_tasks->setColumnWidth(4,40);
+	ui->tw_tasks->setColumnWidth(5,60);
+	QStringList regtype_list; //寄存器类型列表
+    regtype_list.append("u16");
+    regtype_list.append("s16");
+    regtype_list.append("u8");
+    regtype_list.append("s8");
+    regtype_list.append("u16-f");
+    regtype_list.append("s16-f");
+    regtype_list.append("u8-f");
+    regtype_list.append("s8-f");
+	QStringList tasktype_list; //寄存器类型列表
+    tasktype_list.append("06");
+    tasktype_list.append("10");
+    tasktype_list.append("03");
+    tasktype_list.append("04");
+
+	for(int i=0;i<regs_list.size();i++) //遍历所有的寄存器
 	{
-		return ;
+		QTableWidgetItem *item;
+		item = new QTableWidgetItem(); ui->tw_regs->setItem(i, 0, item);
+		item = new QTableWidgetItem(); ui->tw_regs->setItem(i, 1, item);
+		item = new QTableWidgetItem(); ui->tw_regs->setItem(i, 2, item);
+		item = new QTableWidgetItem(); ui->tw_regs->setItem(i, 3, item);
+		item = new QTableWidgetItem(); ui->tw_regs->setItem(i, 4, item);
+		item = new QTableWidgetItem(); ui->tw_regs->setItem(i, 5, item);
+		//item = new QTableWidgetItem(); ui->tw_regs->setItem(i, 6, item);
+		QComboBox *tmpcombo=new QComboBox(); tmpcombo->addItems(regtype_list);
+		ui->tw_regs->setCellWidget(i,6,tmpcombo);
+		item = new QTableWidgetItem(); ui->tw_regs->setItem(i, 7, item);
+		item = new QTableWidgetItem(); ui->tw_regs->setItem(i, 8, item);
+
+		ui->tw_regs->item(i, 0)->setText(regs_list[i].name.c_str());
+		ui->tw_regs->item(i, 1)->setText(QString().sprintf("%04X",regs_list[i].dbuf));
+		ui->tw_regs->item(i, 2)->setText(QString().sprintf("%d",regs_list[i].dbuf));
+		ui->tw_regs->item(i, 3)->setText(QString().sprintf("%d",regs_list[i].addr));
+		ui->tw_regs->item(i, 4)->setText(QString().sprintf("%d",regs_list[i].reg));
+		ui->tw_regs->item(i, 5)->setCheckState(regs_list[i].is_curv?Qt::Checked : Qt::Unchecked);
+		((QComboBox *)(ui->tw_regs->cellWidget(i, 6)))->setCurrentIndex(regs_list[i].d_type);
+		ui->tw_regs->item(i, 7)->setText(QString().sprintf("%.2f",regs_list[i].d_k));
+		ui->tw_regs->item(i, 8)->setText(QString().sprintf("%.2f",regs_list[i].d_off));
 	}
-	if(!config["tasklist"].isArray())
+	for(int i=0;i<task_list.size();i++) //遍历所有任务
 	{
-		return ;
-	}
-	for(auto &it:config["datalist"])
-	{
-		CModbus_RegDis *pt=new CModbus_RegDis();
-		pt->name=it.get("name",QString().sprintf("%04X",pt->reg).toStdString().c_str()).asString();
-		pt->addr=it.get("addr",1).asInt();
-		pt->reg=it.get("reg",0).asInt();
-		pt->data_type=it.get("data_type",0).asInt();
-		pt->data_factor=it.get("data_factor",1.0).asDouble();
-		pt->data_offset=it.get("data_offset",0.0).asDouble();
-		pt->display_type=it.get("display_type",0).asInt();
-	}
-	for(auto &it:config["tasklist"])
-	{
-		CModbus_RegDis *pt=new CModbus_RegDis();
-		pt->name=it.get("name","").asString();
+		QTableWidgetItem *item;
+		item = new QTableWidgetItem(); ui->tw_tasks->setItem(i, 0, item);
+		item = new QTableWidgetItem(); ui->tw_tasks->setItem(i, 1, item);
+		item = new QTableWidgetItem(); ui->tw_tasks->setItem(i, 2, item);
+		//item = new QTableWidgetItem(); ui->tw_tasks->setItem(i, 3, item);
+		QComboBox *tmpcombo=new QComboBox(); tmpcombo->addItems(tasktype_list);
+		ui->tw_tasks->setCellWidget(i,3,tmpcombo);
+		item = new QTableWidgetItem(); ui->tw_tasks->setItem(i, 4, item);
+		item = new QTableWidgetItem(); ui->tw_tasks->setItem(i, 5, item);
+
+		ui->tw_tasks->item(i, 0)->setText(task_list[i].name.c_str());
+		ui->tw_tasks->item(i, 1)->setText(QString().sprintf("%d",task_list[i].addr));
+		ui->tw_tasks->item(i, 2)->setText(QString().sprintf("%d",task_list[i].reg));
+		((QComboBox *)(ui->tw_tasks->cellWidget(i, 3)))->setCurrentIndex(task_list[i].type);
+		ui->tw_tasks->item(i, 4)->setText(QString().sprintf("%d",task_list[i].num));
+		ui->tw_tasks->item(i, 5)->setText("");
 	}
 	chart0 = new QChart();
 	QMargins tmpmarg(5,5,5,5);
@@ -72,7 +129,7 @@ void MainWindow::timerEvent(QTimerEvent *event) //100Hz
 {
 	if(event->timerId() == timerid) //定时器调用，或触发
 	{
-		md_master.poll();
+		task_poll();
 	}
 }
 
@@ -87,7 +144,7 @@ void MainWindow::slot_uart_rx() //串口接收
 	while(n)
 	{
 		n=uart->read(buf,sizeof(buf));
-		md_master.pack((u8*)buf,n);
+		main_md.pack((u8*)buf,n);
 	}
 }
 void MainWindow::uart_rxpro_slot(int type) //uart接收处理

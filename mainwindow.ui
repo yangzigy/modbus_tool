@@ -6,13 +6,13 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1000</width>
+    <width>1200</width>
     <height>600</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>1000</width>
+    <width>1200</width>
     <height>600</height>
    </size>
   </property>
@@ -20,10 +20,10 @@
    <string>modbus display</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">*{font: 18px;}</string>
+   <string notr="true">*{font: 14px;}</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QGridLayout" name="gridLayout_2" rowstretch="1,1" columnstretch="1,1,1">
+   <layout class="QGridLayout" name="gridLayout_2" rowstretch="1,1" columnstretch="2,1,1">
     <property name="leftMargin">
      <number>3</number>
     </property>
@@ -59,13 +59,13 @@
       </property>
       <property name="minimumSize">
        <size>
-        <width>400</width>
+        <width>300</width>
         <height>0</height>
        </size>
       </property>
       <property name="maximumSize">
        <size>
-        <width>400</width>
+        <width>300</width>
         <height>16777215</height>
        </size>
       </property>
@@ -116,7 +116,7 @@
         <widget class="QTextEdit" name="te_comm_log"/>
        </item>
        <item row="2" column="2">
-        <widget class="QPushButton" name="pushButton_5">
+        <widget class="QPushButton" name="bt_clear_data">
          <property name="text">
           <string>清除数据</string>
          </property>
@@ -135,7 +135,7 @@
          </property>
          <layout class="QGridLayout" name="gridLayout_4">
           <item row="5" column="0">
-           <widget class="QRadioButton" name="radioButton_2">
+           <widget class="QRadioButton" name="rb_03">
             <property name="text">
              <string>读保持寄存器</string>
             </property>
@@ -145,21 +145,21 @@
            </widget>
           </item>
           <item row="3" column="0">
-           <widget class="QRadioButton" name="radioButton_4">
+           <widget class="QRadioButton" name="rb_10">
             <property name="text">
              <string>写多寄存器</string>
             </property>
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QLineEdit" name="lineEdit">
+           <widget class="QLineEdit" name="le_addr">
             <property name="text">
              <string>1</string>
             </property>
            </widget>
           </item>
           <item row="0" column="2">
-           <widget class="QPushButton" name="pushButton_6">
+           <widget class="QPushButton" name="bt_send">
             <property name="text">
              <string>发送</string>
             </property>
@@ -173,14 +173,14 @@
            </widget>
           </item>
           <item row="6" column="0">
-           <widget class="QRadioButton" name="radioButton_3">
+           <widget class="QRadioButton" name="rb_04">
             <property name="text">
              <string>读输入寄存器</string>
             </property>
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QLineEdit" name="lineEdit_2">
+           <widget class="QLineEdit" name="le_reg">
             <property name="text">
              <string>0</string>
             </property>
@@ -194,14 +194,14 @@
            </widget>
           </item>
           <item row="3" column="2">
-           <widget class="QLineEdit" name="lineEdit_5">
+           <widget class="QLineEdit" name="le_10_num">
             <property name="text">
              <string>2</string>
             </property>
            </widget>
           </item>
           <item row="2" column="0">
-           <widget class="QRadioButton" name="radioButton">
+           <widget class="QRadioButton" name="rb_06">
             <property name="text">
              <string>写单寄存器</string>
             </property>
@@ -222,14 +222,14 @@
            </widget>
           </item>
           <item row="2" column="2">
-           <widget class="QLineEdit" name="lineEdit_3">
+           <widget class="QLineEdit" name="le_06_val">
             <property name="text">
              <string>00</string>
             </property>
            </widget>
           </item>
           <item row="5" column="2">
-           <widget class="QLineEdit" name="lineEdit_4">
+           <widget class="QLineEdit" name="le_03_num">
             <property name="text">
              <string>1</string>
             </property>
@@ -250,13 +250,34 @@
            </widget>
           </item>
           <item row="4" column="1" colspan="2">
-           <widget class="QLineEdit" name="lineEdit_6">
+           <widget class="QLineEdit" name="le_10_data">
             <property name="text">
              <string>00 00</string>
             </property>
            </widget>
           </item>
          </layout>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QPushButton" name="bt_save_cfg">
+         <property name="text">
+          <string>保存配置</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QPushButton" name="bt_import_cfg">
+         <property name="text">
+          <string>读取配置</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="2">
+        <widget class="QPushButton" name="bt_help">
+         <property name="text">
+          <string>帮助/软件</string>
+         </property>
         </widget>
        </item>
       </layout>
@@ -268,6 +289,21 @@
        <string>registers</string>
       </property>
       <layout class="QGridLayout" name="gridLayout">
+       <property name="leftMargin">
+        <number>2</number>
+       </property>
+       <property name="topMargin">
+        <number>2</number>
+       </property>
+       <property name="rightMargin">
+        <number>2</number>
+       </property>
+       <property name="bottomMargin">
+        <number>2</number>
+       </property>
+       <property name="spacing">
+        <number>2</number>
+       </property>
        <item row="1" column="1">
         <widget class="QPushButton" name="pushButton_2">
          <property name="text">
@@ -296,17 +332,44 @@
         </spacer>
        </item>
        <item row="0" column="0" colspan="2">
-        <widget class="QTableWidget" name="tableWidget"/>
+        <widget class="QTableWidget" name="tw_regs"/>
        </item>
       </layout>
      </widget>
     </item>
     <item row="1" column="1">
      <widget class="QGroupBox" name="groupBox_3">
+      <property name="minimumSize">
+       <size>
+        <width>350</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>350</width>
+        <height>16777215</height>
+       </size>
+      </property>
       <property name="title">
        <string>tasks</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_3">
+       <property name="leftMargin">
+        <number>2</number>
+       </property>
+       <property name="topMargin">
+        <number>2</number>
+       </property>
+       <property name="rightMargin">
+        <number>2</number>
+       </property>
+       <property name="bottomMargin">
+        <number>2</number>
+       </property>
+       <property name="spacing">
+        <number>2</number>
+       </property>
        <item row="1" column="1">
         <widget class="QPushButton" name="pushButton_4">
          <property name="text">
@@ -315,7 +378,7 @@
         </widget>
        </item>
        <item row="0" column="0" colspan="2">
-        <widget class="QTableWidget" name="tableWidget_2"/>
+        <widget class="QTableWidget" name="tw_tasks"/>
        </item>
        <item row="1" column="0">
         <spacer name="horizontalSpacer_2">

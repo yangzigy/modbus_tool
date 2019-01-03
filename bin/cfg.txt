@@ -1,10 +1,10 @@
 {
 	"datalist":
 	[
-		{"name":"温度","addr":2,"reg":1}
+		{"name":"温度","addr":2,"reg":1,"is_curv":1}
 	],
 	"tasklist":
 	[
-		{"name":"温度","addr":2,"type":3,"st":1,"num":1,"fre":0.5}
+		{"name":"温度","addr":2,"type":3,"reg":1,"num":1,"fre":0.5}
 	]
 }

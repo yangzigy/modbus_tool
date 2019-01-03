@@ -24,6 +24,7 @@ win32 {
 
 SOURCES += \
         mainwindow.cpp \
+        appflow.cpp \
     ./src/comm_pack.cpp \
     ./src/common.cpp \
     ./src/jsoncpp.cpp \
@@ -32,6 +33,7 @@ SOURCES += \
 
 HEADERS += \
         mainwindow.h \
+        appflow.h \
     ./src/comm_pack.h \
     ./src/common.h \
     ./src/json.h \

@@ -13,7 +13,7 @@
 #include "qserialportinfo.h"
 #include "json.h"
 #include "common.h"
-#include "modbus.h"
+#include "appflow.h"
 
 extern Json::Value config; //配置对象
 extern CModbus_Master md_master;
@@ -60,17 +60,6 @@ public:
 	string name=""; //寄存器名称
 	u8 addr=0; //地址
 	u16 reg=0; //寄存器地址
-	int data_type=0; //显示类型,0:原始码，1:u16,2:s16,3:u8,4:s8
-	float data_factor=1;
-	float data_offset=0;
-	int display_type=0; //0:十进制,1:HEX,2:float
-};
-class CModbus_TaskList //modbus通信对象
-{
-public:
-	CModbus_RegComm(){}
-	string name=""; //通信对象名
-	MODBUS_ADDR_LIST tl; //任务列表
 };
 
 #endif // MAINWINDOW_H
