@@ -64,10 +64,10 @@ void MainWindow::ui_initial()
     regtype_list.append("s16");
     regtype_list.append("u8");
     regtype_list.append("s8");
-    regtype_list.append("u16-f");
-    regtype_list.append("s16-f");
-    regtype_list.append("u8-f");
-    regtype_list.append("s8-f");
+    regtype_list.append("u16f");
+    regtype_list.append("s16f");
+    regtype_list.append("u8f");
+    regtype_list.append("s8f");
 	QStringList tasktype_list; //寄存器类型列表
     tasktype_list.append("06");
     tasktype_list.append("10");
@@ -112,10 +112,10 @@ void MainWindow::ui_initial()
 		item = new QTableWidgetItem(); ui->tw_tasks->setItem(i, 5, item);
 
 		ui->tw_tasks->item(i, 0)->setText(task_list[i].name.c_str());
-		ui->tw_tasks->item(i, 1)->setText(QString().sprintf("%d",task_list[i].addr));
-		ui->tw_tasks->item(i, 2)->setText(QString().sprintf("%d",task_list[i].reg));
-		((QComboBox *)(ui->tw_tasks->cellWidget(i, 3)))->setCurrentIndex(task_list[i].type);
-		ui->tw_tasks->item(i, 4)->setText(QString().sprintf("%d",task_list[i].num));
+		ui->tw_tasks->item(i, 1)->setText(QString().sprintf("%d",task_list[i].mdbs_buf.addr));
+		ui->tw_tasks->item(i, 2)->setText(QString().sprintf("%d",task_list[i].mdbs_buf.st));
+		((QComboBox *)(ui->tw_tasks->cellWidget(i, 3)))->setCurrentIndex(task_list[i].mdbs_buf.type);
+		ui->tw_tasks->item(i, 4)->setText(QString().sprintf("%d",task_list[i].mdbs_buf.num));
 		ui->tw_tasks->item(i, 5)->setText("");
 	}
 	chart0 = new QChart();
@@ -124,6 +124,17 @@ void MainWindow::ui_initial()
 	chartView0 = new QChartView(chart0);
 
 	timerid=startTimer(10); //初始化定时器
+
+	ui->te_comm_log->setReadOnly(true);
+	u8 tb[8]={1,3,0,8,0,2,0xcc,0xba};
+	u8 tb10[]={1,0x10,0,8,0,2,4,0,1,0,2,0xcc,0xba};
+	u8 rb03[]={1,3,2,8,0,2,4,0xcc,0xba};
+	u8 rberr[]={1,3,2,0xcc,0xba};
+	ui->te_comm_log->tx_pack(tb,sizeof(tb));
+	ui->te_comm_log->rx_pack(rb03,sizeof(rb03));
+	ui->te_comm_log->tx_pack(tb10,sizeof(tb10));
+	ui->te_comm_log->rx_lostlock(rb03,sizeof(rb03));
+	ui->te_comm_log->rx_pack(rberr,sizeof(rberr));
 }
 void MainWindow::timerEvent(QTimerEvent *event) //100Hz
 {

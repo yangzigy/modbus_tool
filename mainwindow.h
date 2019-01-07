@@ -22,7 +22,6 @@ namespace Ui {
 class MainWindow;
 }
 
-class CModbus_RegDis; //modbus寄存器显示
 class MainWindow : public QMainWindow
 {
 	Q_OBJECT
@@ -40,7 +39,6 @@ public:
 
 	QChartView *chartView0;
 	QChart *chart0;
-	vector<shared_ptr<CModbus_RegDis> > reg_list;
 signals:
 	void uart_rxpro_signal(void); //uart接收处理
 
@@ -51,15 +49,6 @@ public slots:
 	void on_bt_open_uart_clicked();
 private:
 	Ui::MainWindow *ui;
-};
-
-class CModbus_RegDis //modbus寄存器显示
-{
-public:
-	CModbus_RegDis(){}
-	string name=""; //寄存器名称
-	u8 addr=0; //地址
-	u16 reg=0; //寄存器地址
 };
 
 #endif // MAINWINDOW_H

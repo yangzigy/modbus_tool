@@ -43,13 +43,7 @@ void task_start(void) //开始任务,将任务列表中的任务变成modbus模�
 	}
 	for(auto &it:task_list) //现在main_md的addr_list是空的
 	{
-		MODBUS_ADDR_LIST *tp=new MODBUS_ADDR_LIST //主机任务
-		{//起始地址,此数组中地址个数,数据缓存,next
-			it.reg,it.num,it.pbuf,0,
-			//地址,任务类型,任务执行频率,计时,err,stat
-			it.addr,it.type,100/it.fre, 0,0,0,
-		};
-		main_md.reg(tp); //主机注册任务
+		main_md.reg(&(it.mdbs_buf)); //主机注册任务
 	}
 	//开始执行
 	is_running=1;

@@ -53,20 +53,17 @@ class CMTask //modbus周期任务
 public:
 	CMTask(){}
 	string name=""; //寄存器名称
-	u8 addr=1; //从机地址
-	u8 type=3; //类型：06 10 03 04
-	u16 reg=0; //寄存器地址
-	u16 num=1; //数量
+	MODBUS_ADDR_LIST mdbs_buf; //modbus任务对象
 	float fre=1; //执行频率
 	Json::Value toJson(void)
 	{
 		Json::Value v;
 		v["name"]=name;
-		v["addr"]=addr;
-		v["reg"]=reg;
-		v["type"]=type;
-		v["num"]=num;
-		v["fre"]=fre;
+		v["addr"]=mdbs_buf.addr;
+		v["reg"]=mdbs_buf.st;
+		v["type"]=mdbs_buf.type;
+		v["num"]=mdbs_buf.num;
+		v["fre"]=mdbs_buf.freq>0?(100/mdbs_buf.freq):0;
 		return v;
 	}
 	int fromJson(Json::Value &v)
@@ -79,18 +76,22 @@ public:
 			v["addr"].isInt())
 		{
 			name=v["name"].asString();
-			reg=v["reg"].asInt();
-			type=v["type"].asInt();
-			num=v["num"].asInt();
-			fre=v["fre"].asDouble();
-			addr=v["addr"].asInt();
+			mdbs_buf.st=v["reg"].asInt();
+			mdbs_buf.type=v["type"].asInt();
+			mdbs_buf.num=v["num"].asInt();
+			float t=v["fre"].asDouble();
+			mdbs_buf.freq=t>=0.01?100/t:100;
+			mdbs_buf.addr=v["addr"].asInt();
 			return 0;
 		}
-		if(pbuf) delete pbuf;
-		pbuf=new u16[num];
+		if(mdbs_buf.buf) delete mdbs_buf.buf;
+		mdbs_buf.buf=new u16[mdbs_buf.num];
+		mdbs_buf.next=0;
+		mdbs_buf.tick=0;
+		mdbs_buf.err=0;
+		mdbs_buf.stat=0;
 		return 1;
 	}
-	u16 *pbuf=0; //任务数据缓存
 };
 
 extern vector<CMReg> regs_list; //寄存器列表

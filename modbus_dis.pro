@@ -29,7 +29,8 @@ SOURCES += \
     ./src/common.cpp \
     ./src/jsoncpp.cpp \
     ./src/modbus.cpp \
-    ./main.cpp 
+    ./main.cpp \ 
+    src/hexstr.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -38,7 +39,9 @@ HEADERS += \
     ./src/common.h \
     ./src/json.h \
     ./src/modbus.h \
-    ./src/main.h 
+    ./src/main.h \ 
+    colorlog.h \
+    src/hexstr.h
 
 FORMS += \
         mainwindow.ui 
