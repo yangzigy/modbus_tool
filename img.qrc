@@ -1,12 +1,13 @@
 <RCC>
     <qresource prefix="/">
-        <file>./img/1.PNG</file>
-        <file>./img/2.PNG</file>
-        <file>./img/3.PNG</file>
-        <file>./img/4.PNG</file>
-        <file>./img/5.PNG</file>
-        <file>./img/6.PNG</file>
-        <file>./img/3.1.PNG</file>
-        <file>./img/6.1.PNG</file>
+        <file>img/1.PNG</file>
+        <file>img/2.PNG</file>
+        <file>img/3.PNG</file>
+        <file>img/4.PNG</file>
+        <file>img/5.PNG</file>
+        <file>img/6.PNG</file>
+        <file>img/3.1.PNG</file>
+        <file>img/6.1.PNG</file>
+        <file>readme.md</file>
     </qresource>
 </RCC>

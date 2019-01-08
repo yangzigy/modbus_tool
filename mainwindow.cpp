@@ -113,7 +113,6 @@ void MainWindow::updateUI_regs(void) //从数据更新界面：寄存器列表
 void MainWindow::updateData_regs(void) //从界面更新数据：寄存器列表
 {
 	int row=ui->tw_regs->rowCount();
-	int col=ui->tw_regs->columnCount();
 	for(int i=0;i<row;i++) //对于每一行
 	{
 		bool b;
@@ -149,7 +148,6 @@ void MainWindow::updateData_regs(void) //从界面更新数据：寄存器列表
 }
 void MainWindow::updateUI_tasks(void) //从数据更新界面：任务列表
 {
-	QObject::disconnect(ui->tw_tasks,SIGNAL(itemChanged(QTableWidgetItem*)),this,SLOT(on_tw_tasks_itemChanged(QTableWidgetItem*)));
 	ui->tw_tasks->clear();
 	ui->tw_tasks->setColumnCount(8);
 	ui->tw_tasks->setRowCount(task_list.size());
@@ -194,12 +192,10 @@ void MainWindow::updateUI_tasks(void) //从数据更新界面：任务列表
 		const char *ttab[]={"正常","错误"};
 		ui->tw_tasks->item(i, 7)->setText(ttab[task_list[i].mdbs_buf.stat==3?1:0]);
 	}
-	QObject::connect(ui->tw_tasks,SIGNAL(itemChanged(QTableWidgetItem*)),this,SLOT(on_tw_tasks_itemChanged(QTableWidgetItem*)));
 }
 void MainWindow::updateData_tasks(void) //从界面更新数据：任务列表
 {
 	int row=ui->tw_tasks->rowCount();
-	int col=ui->tw_tasks->columnCount();
 	for(int i=0;i<row;i++) //对于每一行
 	{
 		bool b;
@@ -282,6 +278,7 @@ void MainWindow::on_bt_start_task_clicked() //开始周期任务
 		if(is_running==1)
 		{
 			ui->bt_start_task->setText("结束周期任务");
+			ui->bt_send->setEnabled(false);
 		}
 	}
 	else
@@ -333,7 +330,15 @@ void MainWindow::on_bt_del_reg_clicked() //删除寄存器
 ////////////////////////////////////////////////////////////////////////////
 void MainWindow::on_bt_help_clicked() //帮助
 {
-	QMessageBox::about(this,"关于软件","<b>asdf</b>qwer,1234<br/><span style=\"color:red\">poiuj</span>");
+	QFile nFile(":/readme.md");
+	if(!nFile.open(QFile::ReadOnly))
+	{
+		qDebug() << "could not open file for reading";
+		return;
+	}
+	string nText =nFile.readAll().data();
+	QMessageBox::about(this,"关于软件",nText.c_str());
+	//QMessageBox::about(this,"关于软件","<b>asdf</b>qwer,1234<br/><span style=\"color:red\">poiuj</span>");
 }
 
 

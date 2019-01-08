@@ -52,7 +52,7 @@ public:
 	u16 dbuf=0; //寄存器的内存空间
 	u16 val_2_org(float f) //值转换为原始u16
 	{
-		return (f-d_k)/d_off;
+		return (f-d_off)/d_k;
 	}
 	float org_2_val(u16 d) //原始u16转换成值
 	{
