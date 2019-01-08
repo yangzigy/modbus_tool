@@ -64,6 +64,7 @@ typedef struct _tag_MODBUS_ADDR_LIST//modbus地址列表
 	u16 tick; //计时,1开始，单次触发任务需要写2
 	u8 err; //0无错，1无回应
 	u8 stat; //0空闲，1正在发送，2正确回复，3错误回复
+	u8 enable; //是否使能
 } MODBUS_ADDR_LIST; //也用作任务列表
 
 #define MAX_REG_NUM		123 //最大单次请求寄存器数量

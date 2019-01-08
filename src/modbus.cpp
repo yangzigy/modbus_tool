@@ -168,6 +168,11 @@ void CModbus_Master::poll(void) //周期函数，主机通过周期函数进行�
 	MODBUS_ADDR_LIST *psend=0;
 	while(tmp) //对于每一个任务
 	{
+		if(tmp->enable==0) //若未使能，下一个
+		{
+			tmp=tmp->next;
+			continue;
+		}
 		if(tmp->freq==0) //若是单次任务
 		{
 			if(tmp->tick>1) //有值就应该发送
@@ -175,7 +180,7 @@ void CModbus_Master::poll(void) //周期函数，主机通过周期函数进行�
 				psend=tmp;
 			}
 		}
-		else if(tmp->tick==tmp->freq) //不是单次，且需要发送
+		else if(tmp->tick>=tmp->freq) //不是单次，且需要发送
 		{
 			psend=tmp;
 		}

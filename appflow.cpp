@@ -9,6 +9,14 @@ vector<CMTask> task_list; //任务列表
 //运行对象
 CModbus_Master main_md;
 int is_running=0; //是否正在运行
+u16 freq_2_tick(float f) //频率转换成间隔
+{
+	return f>=0.01?100/f:100;
+}
+float tick_2_freq(u16 tick) //间隔转换成频率
+{
+	return tick>0?(100.0f/tick):0;
+}
 //////////////////////////////////////////////////////////////////////////////////
 //				初始化
 //////////////////////////////////////////////////////////////////////////////////
@@ -58,6 +66,8 @@ void task_poll(void) //任务周期函数，100Hz
 	{
 		is_running=0;
 		//调用已经关闭任务的处理
+		//这是下一次调用，回复已经超时
+		main_md.addr_list=0;
 	}
 	else if(is_running==1) //若在运行状态
 	{
