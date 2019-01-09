@@ -62,8 +62,8 @@ typedef struct _tag_MODBUS_ADDR_LIST//modbus地址列表
 	u8 type; //任务类型(04 03)
 	u16 freq; //任务执行频率,tick数量，若为0，则为单次任务
 	u16 tick; //计时,1开始，单次触发任务需要写2
-	u8 err; //0无错，1无回应
-	u8 stat; //0空闲，1正在发送，2正确回复，3错误回复
+	u8 err; //0无错，1无回应，2错误回复
+	u8 stat; //0空闲，1正在发送，2正确回复
 	u8 enable; //是否使能
 } MODBUS_ADDR_LIST; //也用作任务列表
 
@@ -78,12 +78,14 @@ public:
 	u8 tx_buf[256];
 	void (*send_fun)(u8 *p,int n);//发送函数
 	void (*rx_fun)(u8 *p,int n);//接收回调函数
+	void (*lostlock_fun)(u8 *p,int n);//失锁回调函数
 	MODBUS_ADDR_LIST *addr_list; //主机任务列表，或从机地址列表
 	CModbus()
 	{
 		address=1;
 		send_fun=modbus_send_void;
 		rx_fun=modbus_send_void;
+		lostlock_fun=modbus_send_void;
 		addr_list=0;
 
 		rec_buff=headbuf;
@@ -98,6 +100,10 @@ public:
 	}
 	void reg(MODBUS_ADDR_LIST *a); //向模块注册周期任务，或地址
 	u16 *get_data(u16 a); //从地址获得数据,输入小端地址
+	virtual void lostlock_cb(u8 b)//失锁回调
+	{
+		lostlock_fun(&b,1);
+	}
 };
 //主：
 //发送数据，可以是03、04、06、10

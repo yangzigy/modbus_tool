@@ -37,7 +37,7 @@ void CComm_Pack::pack(u8 *p,s64 l)
 			}
 			else
 			{
-				//printf("%02x ",*p);
+				lostlock_cb(*p);//失锁回调
 				pre_p=0;
 			}
 			l--;

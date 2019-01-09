@@ -93,38 +93,33 @@ s64 CModbus_Master::pro_pack(u8 *p,s64 len)  //主机接收处理
 	{
 		return 1;
 	}
+	int r=0;
+	if(cur_send==0) goto END;
+	cur_send->err=0;
 	if(p[1]==4 || p[1]==3) //读输入
 	{
 		if(p[2]!=CHANGE_END16(TP.num)*2)
 		{
-			return 0;
+			goto END;
 		}
-		if(cur_send) //将收到的数据放在客户提供的缓存中
+		int i;
+		for(i=0;i<cur_send->num;i++)
 		{
-			int i;
-			for(i=0;i<cur_send->num;i++)
-			{
-				cur_send->buf[i]=CHANGE_END16(MODBUS_RX_DATA[i]);
-			}
-			cur_send->stat=2;
+			cur_send->buf[i]=CHANGE_END16(MODBUS_RX_DATA[i]);
 		}
+		cur_send->stat=2;
 	}
-	else if(p[1]==0x06) //写单寄存器
+	else if(p[1]==0x06 || p[1]==0x10) //写寄存器
 	{
-		if(cur_send) //将收到的数据放在客户提供的缓存中
-		{
-			cur_send->stat=2;
-		}
+		cur_send->stat=2;
 	}
-	else if(p[1]==0x10) //多个写入
+	else //若是错误回复
 	{
-		if(cur_send) //将收到的数据放在客户提供的缓存中
-		{
-			cur_send->stat=2;
-		}
+		cur_send->err=p[2];
 	}
+END:
 	rx_fun(p,len);
-	return 0;
+	return r;
 }
 int CModbus_Master::host_send(u8 addr,u8 fun,u16 st,u16 num,u16 *d) //
 {
@@ -189,13 +184,9 @@ void CModbus_Master::poll(void) //周期函数，主机通过周期函数进行�
 			tmp->tick++;
 		}
 		//判断各任务的正确性
-		if(tmp->stat==1 || tmp->stat==3) //若上次正在发送，现在没有接收,或错误
+		if(tmp->stat==1) //若上次正在发送，现在没有接收
 		{
-			tmp->err=tmp->stat;
-		}
-		else if(tmp->stat==2) //若正确回复
-		{
-			tmp->err=0;
+			tmp->err=0xff;
 		}
 		tmp->stat=0; //清空为空闲状态
 		tmp=tmp->next;
@@ -205,11 +196,11 @@ void CModbus_Master::poll(void) //周期函数，主机通过周期函数进行�
 		psend->tick=1;
 		host_send(psend->addr,psend->type,psend->st,psend->num,psend->buf);
 		psend->stat=1;
+		cur_send=psend; //有新任务才改变，否则就一直等
 		//先清空接收变量
 		pre_p=0;
 	}
-	
-	cur_send=psend;
+	//cur_send=psend;
 }
 ///////////////////////////////////////////////////////////////////////////
 //				从机

@@ -24,6 +24,7 @@ public:
 	s64 pre_p;
 	virtual s64 pre_pack_len(u8 *b,s64 len){return 0;}//返回整包长度
 	virtual s64 pro_pack(u8 * b,s64 len){return 0;}//返回是否正确接收
+	virtual void lostlock_cb(u8 b){}//失锁回调
 
 	//组包函数
 	void pack(u8 *p,s64 l);

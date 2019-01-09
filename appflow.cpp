@@ -17,6 +17,22 @@ float tick_2_freq(u16 tick) //间隔转换成频率
 {
 	return tick>0?(100.0f/tick):0;
 }
+#define MCS		(*(main_md.cur_send))
+void mdbs_rxcb(u8 *p,int n)//接收回调函数
+{
+	//接收回调进入日志
+	modbus_rxpack(p,n);
+	//判断是否是读
+	if(main_md.cur_send==0) return ;
+	if(MCS.type==4 || MCS.type==3)
+	{
+		//拿到当前任务，将任务缓存中的数据更新
+		for(int i=0;i<MCS.num;i++) //每一个寄存器
+		{
+			update_a_reg(MCS.addr,MCS.st+i,MCS.buf[i]);
+		}
+	}
+}
 //////////////////////////////////////////////////////////////////////////////////
 //				初始化
 //////////////////////////////////////////////////////////////////////////////////
@@ -37,6 +53,7 @@ int app_ini(Json::Value v) //将配置文件读入内存列表中
 		if(tt.fromJson(it)) continue;
 		task_list.push_back(tt);
 	}
+	main_md.rx_fun=mdbs_rxcb;
 }
 //////////////////////////////////////////////////////////////////////////////////
 //				任务控制
@@ -79,3 +96,4 @@ void task_poll(void) //任务周期函数，100Hz
 		is_running=2;
 	}
 }
+

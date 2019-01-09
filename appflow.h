@@ -15,8 +15,7 @@ public:
 	string name=""; //寄存器名称
 	u8 addr=1; //从机地址
 	u16 reg=0; //寄存器地址
-	u8 is_curv=1; //是否加入曲线显示
-	u8 d_type=0; //显示类型,0:u16,1:s16,2:u8,3:s8,4:u16-float,5:s16-float,6:u8-float,7:s8-float
+	u8 is_curv=0; //是否加入曲线显示
 	double d_k=1; //数据放大系数
 	double d_off=0; //数据偏移
 	Json::Value toJson(void)
@@ -26,7 +25,6 @@ public:
 		v["addr"]=addr;
 		v["reg"]=reg;
 		v["is_curv"]=is_curv;
-		v["d_type"]=d_type;
 		v["d_k"]=d_k;
 		v["d_off"]=d_off;
 		return v;
@@ -42,7 +40,6 @@ public:
 			reg=v["reg"].asInt();
 			is_curv=v["is_curv"].asInt();
 			addr=v["addr"].asInt();
-			d_type=v.get("d_type",d_type).asInt();
 			jsonget(v,"d_k",d_k);
 			jsonget(v,"d_off",d_off);
 			return 0;
@@ -58,6 +55,7 @@ public:
 	{
 		return d*d_k+d_off;
 	}
+	int need_update_UI=0; //是否需要刷新显示
 };
 class CMTask //modbus周期任务
 {
@@ -68,7 +66,6 @@ public:
 	}
 	string name=""; //寄存器名称
 	MODBUS_ADDR_LIST mdbs_buf; //modbus任务对象
-	float fre=1; //执行频率
 	Json::Value toJson(void)
 	{
 		Json::Value v;
@@ -106,8 +103,12 @@ public:
 		}
 		return 1;
 	}
+	int need_update_UI=0; //是否需要刷新显示
 };
-
+//需外部提供
+extern void update_a_reg(u8 addr,u16 reg,u16 d); //更新一个寄存器
+extern void modbus_rxpack(u8 *p,int n); //modbus模块接收完整帧
+//自身提供
 extern vector<CMReg> regs_list; //寄存器列表
 extern vector<CMTask> task_list; //任务列表
 extern CModbus_Master main_md;
