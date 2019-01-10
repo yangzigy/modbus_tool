@@ -42,6 +42,8 @@ public:
 	//3Hz周期刷新
 	void regs_update_data(void); //从界面更新数据：寄存器列表
 	void tasks_update_data(void); //从界面更新数据：任务列表
+	//
+	void clean_cfg(void); //清理配置
 ////////////////////////////////////////////////////////////////
 // 基本定义
 ////////////////////////////////////////////////////////////////
@@ -55,28 +57,33 @@ public:
 	QChartView *chartView0;
 	QChart *chart0;
 	map<int,QLineSeries *> curv_map; //曲线列表
+	u32 max_curv_len=1000;
 	u32 sttime=0;
 	int is_auto_fitscreen=1; //自动自适应屏幕
 signals:
 	void uart_rxpro_signal(void); //uart接收处理
-	void signal_modbus_lostlock(u8 *p,int n); //modbus模块失锁
+	void signal_modbus_lostlock(u8 b); //modbus模块失锁
 	void signal_update_a_reg(u8 addr,u16 reg,u16 d); //更新一个寄存器
 	void signal_modbus_rxpack(u8 *p,int n); //modbus模块接收完整帧
 public slots:
 	void slot_uart_rx(); //串口接收
-	void slot_modbus_lostlock(u8 *p,int n); //modbus模块失锁
+	void slot_modbus_lostlock(u8 b); //modbus模块失锁
 	void slot_update_a_reg(u8 addr,u16 reg,u16 d); //更新一个寄存器
 	void slot_modbus_rxpack(u8 *p,int n); //modbus模块接收完整帧
 private slots:
 	void on_bt_open_uart_clicked();
 	void on_bt_start_task_clicked();
 	void on_bt_help_clicked();
+private slots:
+	void on_bt_send_clicked();
 	void on_bt_add_task_clicked();
 	void on_bt_fitscreen_clicked();
 	void on_bt_add_reg_clicked();
 	void on_bt_del_task_clicked();
 	void on_bt_clear_data_clicked();
 	void on_bt_del_reg_clicked();
+	void on_bt_import_cfg_clicked();
+	void on_bt_save_cfg_clicked();
 };
 
 #endif // MAINWINDOW_H

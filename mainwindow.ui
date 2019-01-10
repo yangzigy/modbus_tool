@@ -6,13 +6,13 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1100</width>
+    <width>1000</width>
     <height>600</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>1100</width>
+    <width>1000</width>
     <height>600</height>
    </size>
   </property>
@@ -23,7 +23,7 @@
    <string notr="true">*{font: 14px;}</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QGridLayout" name="gridLayout_2" rowstretch="1,1" columnstretch="2,1">
+   <layout class="QGridLayout" name="gridLayout_2" rowstretch="1,1,0" columnstretch="2,1">
     <property name="leftMargin">
      <number>3</number>
     </property>
@@ -39,26 +39,20 @@
     <property name="spacing">
      <number>3</number>
     </property>
-    <item row="1" column="0">
-     <widget class="CColorLog" name="te_comm_log">
-      <property name="styleSheet">
-       <string notr="true">background-color: rgb(150, 150, 150);
-font: 75 14pt &quot;Microsoft JhengHei UI&quot;;</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="0">
-     <widget class="QWidget" name="widget_chart" native="true">
+    <item row="0" column="1" rowspan="3">
+     <widget class="QWidget" name="widget" native="true">
       <property name="minimumSize">
        <size>
-        <width>0</width>
-        <height>100</height>
+        <width>430</width>
+        <height>0</height>
        </size>
       </property>
-     </widget>
-    </item>
-    <item row="0" column="1" rowspan="2">
-     <widget class="QWidget" name="widget" native="true">
+      <property name="maximumSize">
+       <size>
+        <width>430</width>
+        <height>16777215</height>
+       </size>
+      </property>
       <layout class="QGridLayout" name="gridLayout_7">
        <property name="leftMargin">
         <number>3</number>
@@ -85,14 +79,8 @@ font: 75 14pt &quot;Microsoft JhengHei UI&quot;;</string>
          </property>
          <property name="minimumSize">
           <size>
-           <width>550</width>
+           <width>400</width>
            <height>0</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>550</width>
-           <height>16777215</height>
           </size>
          </property>
          <layout class="QGridLayout" name="gridLayout_5">
@@ -112,74 +100,99 @@ font: 75 14pt &quot;Microsoft JhengHei UI&quot;;</string>
            <number>0</number>
           </property>
           <item row="5" column="1">
-           <widget class="QGroupBox" name="groupBox">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>180</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>180</height>
-             </size>
-            </property>
-            <property name="title">
-             <string>单次发送</string>
-            </property>
-            <layout class="QGridLayout" name="gridLayout_4">
+           <widget class="QWidget" name="widget_2" native="true">
+            <layout class="QGridLayout" name="gridLayout_6">
              <property name="leftMargin">
-              <number>3</number>
+              <number>2</number>
              </property>
              <property name="topMargin">
-              <number>3</number>
+              <number>2</number>
              </property>
              <property name="rightMargin">
-              <number>3</number>
+              <number>2</number>
              </property>
              <property name="bottomMargin">
-              <number>3</number>
+              <number>2</number>
              </property>
              <property name="spacing">
-              <number>3</number>
+              <number>2</number>
              </property>
-             <item row="6" column="0">
-              <widget class="QRadioButton" name="rb_04">
+             <item row="4" column="1">
+              <widget class="QPushButton" name="bt_save_cfg">
                <property name="text">
-                <string>读输入(04)</string>
-               </property>
-              </widget>
-             </item>
-             <item row="5" column="2">
-              <widget class="QLineEdit" name="le_03_num">
-               <property name="text">
-                <string>1</string>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="2">
-              <widget class="QLineEdit" name="le_10_num">
-               <property name="text">
-                <string>2</string>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="0">
-              <widget class="QLabel" name="label_6">
-               <property name="text">
-                <string>数据</string>
+                <string>保存配置</string>
                </property>
               </widget>
              </item>
              <item row="0" column="1">
-              <widget class="QLineEdit" name="le_addr">
+              <widget class="QComboBox" name="cb_uart"/>
+             </item>
+             <item row="1" column="1">
+              <widget class="QComboBox" name="cb_baud"/>
+             </item>
+             <item row="2" column="1">
+              <widget class="QPushButton" name="bt_open_uart">
                <property name="text">
-                <string>1</string>
+                <string>打开串口</string>
                </property>
               </widget>
              </item>
-             <item row="5" column="0">
+             <item row="5" column="1">
+              <widget class="QPushButton" name="bt_help">
+               <property name="styleSheet">
+                <string notr="true"/>
+               </property>
+               <property name="text">
+                <string>帮助/软件</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="1">
+              <widget class="QPushButton" name="bt_import_cfg">
+               <property name="text">
+                <string>读取配置</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QGroupBox" name="groupBox">
+            <property name="title">
+             <string>单次发送</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_4" columnstretch="1,1,0,1,1,1">
+             <property name="leftMargin">
+              <number>2</number>
+             </property>
+             <property name="topMargin">
+              <number>2</number>
+             </property>
+             <property name="rightMargin">
+              <number>2</number>
+             </property>
+             <property name="bottomMargin">
+              <number>2</number>
+             </property>
+             <property name="spacing">
+              <number>2</number>
+             </property>
+             <item row="1" column="0">
+              <widget class="QRadioButton" name="rb_10">
+               <property name="text">
+                <string>写多(10)</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QRadioButton" name="rb_06">
+               <property name="text">
+                <string>写单(06)</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
               <widget class="QRadioButton" name="rb_03">
                <property name="text">
                 <string>读保持(03)</string>
@@ -189,49 +202,84 @@ font: 75 14pt &quot;Microsoft JhengHei UI&quot;;</string>
                </property>
               </widget>
              </item>
-             <item row="3" column="1">
-              <widget class="QLabel" name="label_4">
+             <item row="3" column="0">
+              <widget class="QRadioButton" name="rb_04">
                <property name="text">
-                <string>数量</string>
+                <string>读输入(04)</string>
                </property>
               </widget>
              </item>
-             <item row="0" column="0">
+             <item row="0" column="1">
               <widget class="QLabel" name="label">
                <property name="text">
                 <string>地址</string>
                </property>
               </widget>
              </item>
-             <item row="2" column="0">
-              <widget class="QRadioButton" name="rb_06">
+             <item row="0" column="2">
+              <widget class="QLineEdit" name="le_addr">
                <property name="text">
-                <string>写单(06)</string>
+                <string>1</string>
                </property>
               </widget>
              </item>
-             <item row="2" column="1">
+             <item row="0" column="3">
+              <widget class="QLabel" name="label_2">
+               <property name="text">
+                <string>寄存器</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="4">
+              <widget class="QLineEdit" name="le_reg">
+               <property name="text">
+                <string>0</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
               <widget class="QLabel" name="label_3">
                <property name="text">
-                <string>值</string>
+                <string>写值(hex)</string>
                </property>
               </widget>
              </item>
-             <item row="5" column="1">
-              <widget class="QLabel" name="label_5">
+             <item row="1" column="2">
+              <widget class="QLineEdit" name="le_06_val">
+               <property name="text">
+                <string>00</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="3">
+              <widget class="QLabel" name="label_4">
                <property name="text">
                 <string>数量</string>
                </property>
               </widget>
              </item>
-             <item row="4" column="1" colspan="2">
+             <item row="1" column="4">
+              <widget class="QLineEdit" name="le_num">
+               <property name="text">
+                <string>2</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QLabel" name="label_6">
+               <property name="text">
+                <string>写数据</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="2" colspan="4">
               <widget class="QLineEdit" name="le_10_data">
                <property name="text">
                 <string>00 00</string>
                </property>
               </widget>
              </item>
-             <item row="0" column="2">
+             <item row="3" column="4">
               <widget class="QPushButton" name="bt_send">
                <property name="maximumSize">
                 <size>
@@ -244,147 +292,80 @@ font: 75 14pt &quot;Microsoft JhengHei UI&quot;;</string>
                </property>
               </widget>
              </item>
-             <item row="1" column="0">
-              <widget class="QLabel" name="label_2">
-               <property name="text">
-                <string>寄存器</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="2">
-              <widget class="QLineEdit" name="le_06_val">
-               <property name="text">
-                <string>00</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="1">
-              <widget class="QLineEdit" name="le_reg">
-               <property name="text">
-                <string>0</string>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="0">
-              <widget class="QRadioButton" name="rb_10">
-               <property name="text">
-                <string>写多(10)</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item row="5" column="0">
-           <widget class="QWidget" name="widget_2" native="true">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>50</height>
-             </size>
-            </property>
-            <layout class="QGridLayout" name="gridLayout_6">
-             <property name="leftMargin">
-              <number>0</number>
-             </property>
-             <property name="topMargin">
-              <number>0</number>
-             </property>
-             <property name="rightMargin">
-              <number>0</number>
-             </property>
-             <property name="bottomMargin">
-              <number>0</number>
-             </property>
-             <property name="spacing">
-              <number>0</number>
-             </property>
-             <item row="2" column="1">
-              <widget class="QPushButton" name="bt_save_cfg">
-               <property name="text">
-                <string>保存配置</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="1">
-              <widget class="QPushButton" name="bt_clear_data">
-               <property name="text">
-                <string>清除数据</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="2">
-              <widget class="QComboBox" name="cb_baud"/>
-             </item>
-             <item row="2" column="0">
-              <widget class="QCheckBox" name="cb_auto_fitscreen">
-               <property name="text">
-                <string>曲线自适应</string>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="2">
-              <widget class="QPushButton" name="bt_help">
-               <property name="text">
-                <string>帮助/软件</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="2">
-              <widget class="QPushButton" name="bt_import_cfg">
-               <property name="text">
-                <string>读取配置</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0">
-              <widget class="QPushButton" name="bt_fitscreen">
-               <property name="text">
-                <string>适应屏幕</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <widget class="QComboBox" name="cb_uart"/>
-             </item>
-             <item row="0" column="0">
-              <widget class="QPushButton" name="bt_open_uart">
-               <property name="text">
-                <string>打开串口</string>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="0">
-              <widget class="QPushButton" name="bt_start_task">
-               <property name="text">
-                <string>开始周期任务</string>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="1">
-              <widget class="QPushButton" name="bt_add_task">
-               <property name="text">
-                <string>添加任务</string>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="2">
-              <widget class="QPushButton" name="bt_del_task">
-               <property name="text">
-                <string>删除任务</string>
-               </property>
-              </widget>
-             </item>
             </layout>
            </widget>
           </item>
          </layout>
         </widget>
        </item>
-       <item row="3" column="0">
+       <item row="2" column="0">
+        <widget class="QGroupBox" name="groupBox_3">
+         <property name="minimumSize">
+          <size>
+           <width>300</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="title">
+          <string>tasks</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_3">
+          <property name="leftMargin">
+           <number>2</number>
+          </property>
+          <property name="topMargin">
+           <number>2</number>
+          </property>
+          <property name="rightMargin">
+           <number>2</number>
+          </property>
+          <property name="bottomMargin">
+           <number>2</number>
+          </property>
+          <property name="spacing">
+           <number>2</number>
+          </property>
+          <item row="0" column="0">
+           <widget class="QPushButton" name="bt_start_task">
+            <property name="text">
+             <string>开始周期任务</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QPushButton" name="bt_add_task">
+            <property name="text">
+             <string>添加任务</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QPushButton" name="bt_del_task">
+            <property name="text">
+             <string>删除任务</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <spacer name="horizontalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="1" column="0" colspan="4">
+           <widget class="QTableWidget" name="tw_tasks"/>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="4" column="0">
         <widget class="QGroupBox" name="groupBox_2">
          <property name="title">
           <string>registers</string>
@@ -438,18 +419,54 @@ font: 75 14pt &quot;Microsoft JhengHei UI&quot;;</string>
          </layout>
         </widget>
        </item>
-       <item row="1" column="0">
-        <widget class="QGroupBox" name="groupBox_3">
+      </layout>
+     </widget>
+    </item>
+    <item row="0" column="0" rowspan="2">
+     <widget class="QWidget" name="widget_3" native="true">
+      <layout class="QGridLayout" name="gridLayout_8" rowstretch="1,0,1">
+       <property name="leftMargin">
+        <number>2</number>
+       </property>
+       <property name="topMargin">
+        <number>2</number>
+       </property>
+       <property name="rightMargin">
+        <number>2</number>
+       </property>
+       <property name="bottomMargin">
+        <number>2</number>
+       </property>
+       <property name="spacing">
+        <number>2</number>
+       </property>
+       <item row="2" column="0">
+        <widget class="CColorLog" name="te_comm_log">
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(150, 150, 150);
+font: 75 14pt &quot;Microsoft JhengHei UI&quot;;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0" colspan="2">
+        <widget class="QWidget" name="widget_chart" native="true">
          <property name="minimumSize">
           <size>
-           <width>350</width>
-           <height>0</height>
+           <width>0</width>
+           <height>100</height>
           </size>
          </property>
-         <property name="title">
-          <string>tasks</string>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="2">
+        <widget class="QWidget" name="widget_4" native="true">
+         <property name="minimumSize">
+          <size>
+           <width>50</width>
+           <height>50</height>
+          </size>
          </property>
-         <layout class="QGridLayout" name="gridLayout_3">
+         <layout class="QGridLayout" name="gridLayout_9">
           <property name="leftMargin">
            <number>2</number>
           </property>
@@ -465,8 +482,42 @@ font: 75 14pt &quot;Microsoft JhengHei UI&quot;;</string>
           <property name="spacing">
            <number>2</number>
           </property>
-          <item row="1" column="0" colspan="3">
-           <widget class="QTableWidget" name="tw_tasks"/>
+          <item row="0" column="2">
+           <widget class="QPushButton" name="bt_fitscreen">
+            <property name="text">
+             <string>适应屏幕</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QCheckBox" name="cb_auto_fitscreen">
+            <property name="text">
+             <string>曲线自适应</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0" rowspan="2">
+           <widget class="QLabel" name="label_7">
+            <property name="styleSheet">
+             <string notr="true">background-color: rgb(150, 150, 150);
+font: 75 14pt &quot;Microsoft JhengHei UI&quot;;</string>
+            </property>
+            <property name="text">
+             <string>发送：&lt;span style=&quot;color:red;font-weight:800&quot;&gt; 地址&lt;/span&gt; &lt;span style=&quot;color:yellow;font-weight:800&quot;&gt; 指令&lt;/span&gt; &lt;span style=&quot;color:blue;font-weight:800&quot;&gt;寄存器&lt;/span&gt; &lt;span style=&quot;color:Fuchsia;font-weight:800&quot;&gt;数量&lt;/span&gt; &lt;span style=&quot;color:green;font-weight:800&quot;&gt;数据&lt;/span&gt; &lt;br/&gt;
+接收：&lt;span style=&quot;background-color:red&quot;&gt;地址&lt;/span&gt; &lt;span style=&quot;background-color:yellow&quot;&gt;指令&lt;/span&gt; &lt;span style=&quot;background-color:blue&quot;&gt;寄存器&lt;/span&gt; &lt;span style=&quot;background-color:Fuchsia&quot;&gt;数量&lt;/span&gt; &lt;span style=&quot;background-color:green&quot;&gt;数据&lt;/span&gt; &lt;span style=&quot;background-color:red&quot;&gt;错误&lt;/span&gt; &lt;span style=&quot;background-color:white&quot;&gt;失锁&lt;/span&gt;
+</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QPushButton" name="bt_clear_data">
+            <property name="text">
+             <string>清除数据</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>

@@ -1,10 +1,38 @@
 {
-	"datalist":
-	[
-		{"name":"温度","addr":2,"reg":1,"is_curv":1}
-	],
-	"tasklist":
-	[
-		{"name":"温度","addr":2,"type":3,"reg":1,"num":1,"fre":0.5}
-	]
+   "datalist" : [
+      {
+         "addr" : 2,
+         "d_k" : 1,
+         "d_off" : 0,
+         "is_curv" : 1,
+         "name" : "温度",
+         "reg" : 1
+      },
+      {
+         "addr" : 2,
+         "d_k" : 1,
+         "d_off" : 0,
+         "is_curv" : 1,
+         "name" : "湿度",
+         "reg" : 0
+      }
+   ],
+   "tasklist" : [
+      {
+         "addr" : 2,
+         "fre" : 0.5,
+         "name" : "温度",
+         "num" : 2,
+         "reg" : 0,
+         "type" : 3
+      },
+      {
+         "addr" : 0,
+         "fre" : 1,
+         "name" : "湿度",
+         "num" : 0,
+         "reg" : 0,
+         "type" : 4
+      }
+   ]
 }

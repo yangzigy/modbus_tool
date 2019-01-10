@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QInputDialog>
+#include "hexstr.h"
 
 const u32 com_baud_tab[]=//串口波特率表
 {
@@ -26,7 +27,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	uart=new QSerialPort();
 	QObject::connect(uart, SIGNAL(readyRead()), this, SLOT(slot_uart_rx()));
-	QObject::connect(this,SIGNAL(signal_modbus_lostlock(u8*,int)),this,SLOT(slot_modbus_lostlock(u8*,int)),Qt::BlockingQueuedConnection); //传指针了，必须阻塞
+	QObject::connect(this,SIGNAL(signal_modbus_lostlock(u8)),this,SLOT(slot_modbus_lostlock(u8)));
 	QObject::connect(this,SIGNAL(signal_update_a_reg(u8,u16,u16)),this,SLOT(slot_update_a_reg(u8,u16,u16)));
 	QObject::connect(this,SIGNAL(signal_modbus_rxpack(u8*,int)),this,SLOT(slot_modbus_rxpack(u8*,int)));
 }
@@ -35,21 +36,20 @@ MainWindow::~MainWindow()
 {
 	delete ui;
 }
-
 void MainWindow::ui_initial()
 {
 	regs_create_UI();
 	tasks_create_UI();
 
 	chart0 = new QChart();
-	QMargins tmpmarg(5,5,5,5);
+	QMargins tmpmarg(0,0,0,0);
 	chart0->setMargins(tmpmarg);
 	chartView0 = new QChartView(chart0);
 //	chart0->createDefaultAxes();
 //	chart0->axisX()->setRange(0, 100);
 //	chart0->axisY()->setRange(-100, 100);
 	chartView0->setRubberBand(QChartView::RectangleRubberBand);
-	ui->gridLayout_2->addWidget(chartView0,0,0);
+	ui->gridLayout_8->addWidget(chartView0,0,0);
 
 	timerid=startTimer(10); //初始化定时器
 
@@ -66,10 +66,22 @@ void MainWindow::ui_initial()
 	ui->te_comm_log->rx_pack(rberr,sizeof(rberr));
 
 	sttime=com_time_getms();
+//	QPalette pal = window()->palette();
+//	pal.setColor(QPalette::Window, QRgb(0x40434a));//黑灰
+//	pal.setColor(QPalette::WindowText, QRgb(0xd6d6d6));//白灰
+//	window()->setPalette(pal);
+	//chartView0->chart()->setTheme(QChart::ChartThemeLight); //普通
+	//chartView0->chart()->setTheme(QChart::ChartThemeBlueCerulean); //正常偏暗
+//	chartView0->chart()->setTheme(QChart::ChartThemeDark); //暗
+	chartView0->chart()->setTheme(QChart::ChartThemeBrownSand); //黄正常
+	//chartView0->chart()->setTheme(QChart::ChartThemeBlueNcs); //普通
+	//chartView0->chart()->setTheme(QChart::ChartThemeHighContrast); //近似黑白
+	//chartView0->chart()->setTheme(QChart::ChartThemeBlueIcy); //普通
+	//chartView0->chart()->setTheme(QChart::ChartThemeQt); //普通
 }
-void MainWindow::slot_modbus_lostlock(u8 *p,int n) //modbus模块失锁
+void MainWindow::slot_modbus_lostlock(u8 b) //modbus模块失锁
 {
-	ui->te_comm_log->rx_lostlock(p,n); //加入日志
+	ui->te_comm_log->rx_lostlock(&b,1); //加入日志
 }
 void MainWindow::slot_modbus_rxpack(u8 *p,int n) //modbus模块失锁
 {
@@ -92,6 +104,10 @@ void MainWindow::slot_update_a_reg(u8 addr,u16 reg,u16 d) //更新一个寄存�
 				if(curv_map.count(s_no)>0 && curv_map[s_no]) //且曲线列表中有
 				{
 					u32 tmptime=com_time_getms();
+					if(curv_map[s_no]->count()>max_curv_len)
+					{
+						curv_map[s_no]->removePoints(0,1);
+					}
 					curv_map[s_no]->append(tmptime-sttime,
 							regs_list[i].org_2_val(regs_list[i].dbuf));
 				}
@@ -126,20 +142,21 @@ void MainWindow::regs_update_UI(void) //刷新界面：寄存器，看标志是�
 		auto cs=chart0->series();
 		if(cs.size()>0)
 		{
-			int xmax=10000; //时间长度
-			float ymin=-10,ymax=10; //数据长度
+			int xmin=0xffffffff,xmax=10000; //时间长度
+			float ymin=0,ymax=10; //数据长度
 			for(int i=0;i<cs.size();i++) //每一条线
 			{
 				QLineSeries *ps=(QLineSeries *)cs.at(i);
 				for(int j=0;j<ps->count();j++)
 				{
 					QPointF qf=ps->at(j);
+					if(xmin>qf.rx()) xmin=qf.rx();
 					if(xmax<qf.rx()) xmax=qf.rx();
 					if(ymin>qf.ry()) ymin=qf.ry();
 					if(ymax<qf.ry()) ymax=qf.ry();
 				}
 			}
-			chart0->axisX()->setRange(0, xmax);
+			chart0->axisX()->setRange(xmin, xmax);
 			chart0->axisY()->setRange(ymin,ymax);
 		}
 	}
@@ -154,7 +171,7 @@ void MainWindow::regs_create_UI(void) //从数据更新界面：寄存器列表
 	ui->tw_regs->setHorizontalHeaderLabels(QStringList() <<
 		"名称"<<"原始值"<<"值"<<"地址"<<"寄存器"<<"曲线"<<"系数"<<"偏移");
 	ui->tw_regs->setColumnWidth(0,60);
-	ui->tw_regs->setColumnWidth(1,60);
+	ui->tw_regs->setColumnWidth(1,50);
 	ui->tw_regs->setColumnWidth(2,70);
 	ui->tw_regs->setColumnWidth(3,40);
 	ui->tw_regs->setColumnWidth(4,50);
@@ -244,7 +261,7 @@ void MainWindow::regs_update_data(void) //从界面更新数据：寄存器列�
 		for(i=0;i<regs_list.size();i++)
 		{
 			int s_no=regs_list[i].addr*256+regs_list[i].reg;
-			if(s_no==it.first) break;//若找到了
+			if(s_no==it.first && regs_list[i].is_curv) break;//若找到了
 		}
 		if(i==regs_list.size()) //若没找到
 		{ //删除此曲线
@@ -274,10 +291,6 @@ void MainWindow::tasks_update_UI_row(int row) //刷新界面：任务
 }
 void MainWindow::tasks_update_UI(void) //刷新界面：任务
 {
-//	for(int i=0;i<task_list.size();i++)
-//	{
-//		if(task_list[i].need_update_UI) tasks_update_UI_row(i);
-//	}
 	//任务界面基本只接收指令，数据更新只有状态
 	for(int i=0;i<task_list.size();i++) //遍历所有任务
 	{
@@ -415,6 +428,9 @@ void MainWindow::on_bt_start_task_clicked() //开始周期任务
 		{
 			ui->bt_start_task->setText("结束周期任务");
 			ui->bt_send->setEnabled(false);
+			ui->bt_import_cfg->setEnabled(false);
+			ui->bt_add_task->setEnabled(false);
+			ui->bt_del_task->setEnabled(false);
 		}
 	}
 	else
@@ -422,11 +438,14 @@ void MainWindow::on_bt_start_task_clicked() //开始周期任务
 		task_stop();
 		ui->bt_start_task->setText("开始周期任务");
 		ui->bt_send->setEnabled(true);
+		ui->bt_import_cfg->setEnabled(true);
+		ui->bt_add_task->setEnabled(true);
+		ui->bt_del_task->setEnabled(true);
 	}
 }
 void MainWindow::on_bt_add_task_clicked() //添加任务
 {
-	CMTask tt;
+	CMTask tt; //
 	tt.mdbs_buf.enable=0;
 	task_list.push_back(tt);
 	tasks_create_UI();
@@ -442,6 +461,60 @@ void MainWindow::on_bt_del_task_clicked() //删除任务
 		tasks_create_UI();
 	}
 }
+CMTask single_task; //单次发送任务
+void MainWindow::on_bt_send_clicked() //单次发送
+{
+	if(is_running!=0) //只能在结束状态下使用
+	{
+		return ;
+	}
+	//取得此任务的参数
+	single_task.need_update_UI=1;
+
+	single_task.mdbs_buf.type=3; //类型
+	if(ui->rb_04->isChecked()) single_task.mdbs_buf.type=4;
+	if(ui->rb_06->isChecked()) single_task.mdbs_buf.type=6;
+	if(ui->rb_10->isChecked()) single_task.mdbs_buf.type=0x10;
+
+	single_task.mdbs_buf.addr=ui->le_addr->text().toInt(); //地址
+	single_task.mdbs_buf.st=ui->le_reg->text().toInt(); //寄存器
+	if(single_task.mdbs_buf.type==6) //数量
+	{
+		single_task.mdbs_buf.num=1;
+	}
+	else
+	{
+		single_task.mdbs_buf.num=ui->le_num->text().toInt();
+	}
+	if(single_task.mdbs_buf.buf) delete[] single_task.mdbs_buf.buf; //缓存
+	single_task.mdbs_buf.buf=new u16[single_task.mdbs_buf.num];
+	if(single_task.mdbs_buf.type==6) //若写单
+	{
+		bool b;
+		single_task.mdbs_buf.buf[0]=ui->le_06_val->text().toInt(&b,16);
+	}
+	else if(single_task.mdbs_buf.type==0x10) //若写多
+	{
+		vector<u8> v;
+		string s=ui->le_10_data->text().toStdString();
+		int r=str2bin(s.c_str(),s.size(),v);
+		if(r==0 && v.size()==single_task.mdbs_buf.num)
+		{
+			memcpy(single_task.mdbs_buf.buf,&(v[0]),v.size());
+		}
+		else
+		{//错误
+			return ;
+		}
+	}
+	single_task.mdbs_buf.freq=1;
+	single_task.mdbs_buf.enable=1;
+
+	//注册，开始
+	main_md.reg(&(single_task.mdbs_buf)); //主机注册任务
+	is_running=3;
+}
+
 ////////////////////////////////////////////////////////////////////////////
 //					寄存器部分
 ////////////////////////////////////////////////////////////////////////////
@@ -463,7 +536,7 @@ void MainWindow::on_bt_del_reg_clicked() //删除寄存器
 	}
 }
 ////////////////////////////////////////////////////////////////////////////
-//					帮助
+//					配置与帮助
 ////////////////////////////////////////////////////////////////////////////
 void MainWindow::on_bt_help_clicked() //帮助
 {
@@ -476,4 +549,52 @@ void MainWindow::on_bt_help_clicked() //帮助
 	string nText =nFile.readAll().data();
 	QMessageBox::about(this,"关于软件",nText.c_str());
 	//QMessageBox::about(this,"关于软件","<b>asdf</b>qwer,1234<br/><span style=\"color:red\">poiuj</span>");
+}
+void MainWindow::clean_cfg(void) //清理配置
+{
+	regs_list.clear();
+	ui->tw_regs->clear();
+	task_list.clear();
+	ui->tw_tasks->clear();
+	curv_map.clear();
+	chart0->removeAllSeries(); //去掉所有曲线
+	sttime=com_time_getms();
+}
+void MainWindow::on_bt_import_cfg_clicked() //导入配置
+{
+	auto name=QFileDialog::getOpenFileName(0,"","","txt文件(*.txt)");
+	if(name!="")
+	{
+		string text=read_textfile(name.toStdString().c_str());
+		Json::Reader reader;
+		reader.parse(text.c_str(),config,false); //可以有注释,false不会复制
+		pjson(config); //输出配置字符
+
+		clean_cfg(); //首先清理配置
+		app_ini(config);
+		regs_create_UI();
+		tasks_create_UI();
+	}
+}
+
+void MainWindow::on_bt_save_cfg_clicked() //保存配置
+{
+	auto name=QFileDialog::getSaveFileName (0,"","","txt文件(*.txt)");
+	if(name!="")
+	{
+		Json::Value v;
+		for(int i=0;i<regs_list.size();i++)
+		{
+			v["datalist"][i]=regs_list[i].toJson();
+		}
+		for(int i=0;i<task_list.size();i++)
+		{
+			v["tasklist"][i]=task_list[i].toJson();
+		}
+		Json::StyledWriter writer;
+		string s=writer.write(v);
+		CComFile cf;
+		cf.open(name.toStdString().c_str(),"wb");
+		cf.write((u8*)s.c_str(),s.size());
+	}
 }

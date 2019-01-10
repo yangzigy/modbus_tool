@@ -47,6 +47,7 @@ int app_ini(Json::Value v) //将配置文件读入内存列表中
 		if(tr.fromJson(it)) continue;
 		regs_list.push_back(tr);
 	}
+	task_list.clear();
 	for(auto &it:v["tasklist"])
 	{
 		CMTask tt;

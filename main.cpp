@@ -16,7 +16,10 @@ void modbus_send_uart(u8 *p,int n) //modbus模块发送
 }
 void modbus_lostlock(u8 *p,int n) //modbus模块失锁
 {
-	pw->signal_modbus_lostlock(p,n); //加入日志
+	for(int i=0;i<n;i++)
+	{
+		pw->signal_modbus_lostlock(p[i]); //加入日志
+	}
 }
 void modbus_rxpack(u8 *p,int n) //modbus模块接收完整帧
 {

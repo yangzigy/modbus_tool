@@ -18,9 +18,8 @@ public:
 	QTextCursor tcursor;
 	CColorLog(QWidget *p= 0):QTextEdit(p)
 	{
-		//textCursor().movePosition(QTextCursor::EndOfBlock);
 		tcursor=this->textCursor();
-		tcursor.movePosition(QTextCursor::EndOfBlock);
+		tcursor.movePosition(QTextCursor::End);
 		setTextCursor(tcursor);
 		//insertHtml("<span style=\"color:red\">asdf</span>");
 		//insertHtml("<span style=\"color:green;background-color:blue\">This is some text!</span>");
@@ -37,6 +36,11 @@ public:
 			int p=ht.indexOf("<br/>",ht.size()*2/3);
 			ht.remove(0,p);
 			setHtml(ht);
+		}
+		QScrollBar *scrollbar = verticalScrollBar();
+		if(scrollbar)
+		{
+			scrollbar->setSliderPosition(scrollbar->maximum());
 		}
 	}
 	void tx_pack(u8 *p,int n) //发送数据

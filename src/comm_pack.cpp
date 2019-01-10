@@ -76,6 +76,7 @@ void CComm_Pack::pack(u8 *p,s64 l)
 				if(pro_pack(rec_buff, pack_len))
 				{//若接收不正确
 					pre_p=0;
+					lostlock_cb(rec_buff[0]);//失锁回调
 					pack(rec_buff+1,pack_len-1);
 				}
 				else
