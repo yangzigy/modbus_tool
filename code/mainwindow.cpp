@@ -540,15 +540,19 @@ void MainWindow::on_bt_del_reg_clicked() //删除寄存器
 ////////////////////////////////////////////////////////////////////////////
 void MainWindow::on_bt_help_clicked() //帮助
 {
-	QFile nFile(":/readme.md");
+	QFile nFile(":/help.html");
 	if(!nFile.open(QFile::ReadOnly))
 	{
 		qDebug() << "could not open file for reading";
 		return;
 	}
 	string nText =nFile.readAll().data();
-	QMessageBox::about(this,"关于软件",nText.c_str());
-	//QMessageBox::about(this,"关于软件","<b>asdf</b>qwer,1234<br/><span style=\"color:red\">poiuj</span>");
+	//widget_help->setGeometry(100,100,400,500);
+	widget_help->setStyleSheet("font-size:14px;");
+	widget_help->setMinimumWidth(500);
+	widget_help->setMinimumHeight(500);
+	widget_help->setHtml(nText.c_str());
+	widget_help->show();
 }
 void MainWindow::clean_cfg(void) //清理配置
 {

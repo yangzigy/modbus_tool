@@ -3,8 +3,8 @@ QT       += core gui serialport charts
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-DESTDIR += ./bin
-OBJECTS_DIR = ./bin/obj
+DESTDIR += ../bin
+OBJECTS_DIR = ../bin/obj
 TARGET = modbusdis
 TEMPLATE = app
 DEFINES -= UNICODE
@@ -47,5 +47,5 @@ FORMS += \
         mainwindow.ui 
 
 RESOURCES += \
-    img.qrc
+    res.qrc
 
