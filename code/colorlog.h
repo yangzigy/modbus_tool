@@ -126,6 +126,40 @@ public:
 		check_len(pbuf-sbuf);
 		stat=1;
 	}
+	void tx_slave_pack(u8 *p,int n) //从机发送数据
+	{
+		if(n<5) return ;
+		setTextCursor(tcursor);
+		char sbuf[25600]={0};
+		char *pbuf=sbuf;
+		pbuf+=sprintf(pbuf,"<br/><span style=\"font-weight:800;color:red\">%02X</span> ",p[0]);
+		pbuf+=sprintf(pbuf,"<span style=\"font-weight:800;color:yellow\">%02X</span> ",p[1]);
+		int pp=2;
+		if(n==5) //若是错误包
+		{
+			pbuf+=sprintf(pbuf,"<span style=\"font-weight:800;color:red\">%02X</span> ",p[pp++]);
+		}
+		else if(n==8) //若是06/10包
+		{
+			pbuf+=sprintf(pbuf,"<span style=\"font-weight:800;color:blue\">%02X %02X</span> ",p[2],p[3]);
+			pbuf+=sprintf(pbuf,"<span style=\"font-weight:800;color:Fuchsia\">%02X %02X</span> ",p[4],p[5]);
+			pp=6;
+		}
+		else //读数据包
+		{
+			pbuf+=sprintf(pbuf," %02X<span style=\"font-weight:800;color:green\">",p[pp++]);
+			for(;pp<n-2;pp++)
+			{
+				pbuf+=sprintf(pbuf," %02X",p[pp]);
+			}
+			pbuf+=sprintf(pbuf,"</span> ");
+		}
+		//CRC
+		pbuf+=sprintf(pbuf,"%02X %02X",p[pp],p[pp+1]);
+		insertHtml(sbuf);
+		check_len(pbuf-sbuf);
+		stat=1;
+	}
 };
 
 #endif // 

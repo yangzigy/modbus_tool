@@ -11,7 +11,8 @@ void modbus_send_uart(u8 *p,int n) //modbus模块发送
 	if(pw->uart->isOpen())
 	{
 		pw->uart->write((const char *)p,n);
-		pw->ui->te_comm_log->tx_pack(p,n); //加入日志
+		if(is_master) pw->ui->te_comm_log->tx_pack(p,n); //加入日志
+		else  pw->ui->te_comm_log->tx_slave_pack(p,n); //加入日志
 	}
 }
 void modbus_lostlock(u8 *p,int n) //modbus模块失锁
@@ -36,6 +37,8 @@ int main(int argc, char *argv[])
 {
 	main_md.send_fun=modbus_send_uart;
 	main_md.lostlock_fun=modbus_lostlock;
+	slave_md.send_fun=modbus_send_uart;
+	slave_md.lostlock_fun=modbus_lostlock;
 
     QApplication a(argc, argv);
 // # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #

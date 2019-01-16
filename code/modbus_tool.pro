@@ -5,7 +5,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 DESTDIR += ../bin
 OBJECTS_DIR = ../bin/obj
-TARGET = modbusdis
+TARGET = modbus_tool
 TEMPLATE = app
 DEFINES -= UNICODE
 

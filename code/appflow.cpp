@@ -8,6 +8,8 @@ vector<CMTask> task_list; //任务列表
 
 //运行对象
 CModbus_Master main_md;
+CModbus_Slave slave_md;
+int is_master=1; //是否是主模式
 int is_running=0; //是否正在运行
 u16 freq_2_tick(float f) //频率转换成间隔
 {
@@ -33,6 +35,31 @@ void mdbs_rxcb(u8 *p,int n)//接收回调函数
 		}
 	}
 }
+void mdbs_rxcb_slave(u8 *p,int n)//接收回调函数
+{
+	//接收回调进入日志
+	modbus_rxpack(p,n);
+	if(p[1]==6)
+	{
+		u16 reg=(*(MODBUS_RTU_REQ*)p).st;
+		u16 d=(*(MODBUS_RTU_REQ*)p).num;
+		d=CHANGE_END16(d);
+		update_a_reg(p[0],reg,d);
+	}
+	if(p[1]==0x10)
+	{
+		int i;
+		u16 reg=(*(MODBUS_RTU_REQ*)p).st;
+		u16 num=(*(MODBUS_RTU_REQ*)p).num;
+		num=CHANGE_END16(num);
+		for(i=0;i<num;i++)
+		{
+			u16 d=((u16*)(p+7))[i];
+			d=CHANGE_END16(d);
+			update_a_reg(p[0],reg+i,d);
+		}
+	}
+}
 //////////////////////////////////////////////////////////////////////////////////
 //				初始化
 //////////////////////////////////////////////////////////////////////////////////
@@ -55,6 +82,10 @@ int app_ini(Json::Value v) //将配置文件读入内存列表中
 		task_list.push_back(tt);
 	}
 	main_md.rx_fun=mdbs_rxcb;
+	slave_md.rx_fun=mdbs_rxcb_slave;
+}
+void app_master_slave(int m) //切换主从模式
+{
 }
 //////////////////////////////////////////////////////////////////////////////////
 //				任务控制

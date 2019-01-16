@@ -45,9 +45,6 @@ void MainWindow::ui_initial()
 	QMargins tmpmarg(0,0,0,0);
 	chart0->setMargins(tmpmarg);
 	chartView0 = new QChartView(chart0);
-//	chart0->createDefaultAxes();
-//	chart0->axisX()->setRange(0, 100);
-//	chart0->axisY()->setRange(-100, 100);
 	chartView0->setRubberBand(QChartView::RectangleRubberBand);
 	ui->gridLayout_8->addWidget(chartView0,0,0);
 
@@ -55,15 +52,15 @@ void MainWindow::ui_initial()
 
 	ui->te_comm_log->setReadOnly(true);
 	//测试
-	u8 tb[8]={1,3,0,8,0,2,0xcc,0xba};
-	u8 tb10[]={1,0x10,0,8,0,2,4,0,1,0,2,0xcc,0xba};
-	u8 rb03[]={1,3,2,8,0,2,4,0xcc,0xba};
-	u8 rberr[]={1,3,2,0xcc,0xba};
-	ui->te_comm_log->tx_pack(tb,sizeof(tb));
-	ui->te_comm_log->rx_pack(rb03,sizeof(rb03));
-	ui->te_comm_log->tx_pack(tb10,sizeof(tb10));
-	ui->te_comm_log->rx_lostlock(rb03,sizeof(rb03));
-	ui->te_comm_log->rx_pack(rberr,sizeof(rberr));
+//	u8 tb[8]={1,3,0,8,0,2,0xcc,0xba};
+//	u8 tb10[]={1,0x10,0,8,0,2,4,0,1,0,2,0xcc,0xba};
+//	u8 rb03[]={1,3,2,8,0,2,4,0xcc,0xba};
+//	u8 rberr[]={1,3,2,0xcc,0xba};
+//	ui->te_comm_log->tx_pack(tb,sizeof(tb));
+//	ui->te_comm_log->rx_pack(rb03,sizeof(rb03));
+//	ui->te_comm_log->tx_pack(tb10,sizeof(tb10));
+//	ui->te_comm_log->rx_lostlock(rb03,sizeof(rb03));
+//	ui->te_comm_log->rx_pack(rberr,sizeof(rberr));
 
 	sttime=com_time_getms();
 //	QPalette pal = window()->palette();
@@ -78,6 +75,107 @@ void MainWindow::ui_initial()
 	//chartView0->chart()->setTheme(QChart::ChartThemeHighContrast); //近似黑白
 	//chartView0->chart()->setTheme(QChart::ChartThemeBlueIcy); //普通
 	//chartView0->chart()->setTheme(QChart::ChartThemeQt); //普通
+
+	//设置输入限制
+	QValidator *validator=new QIntValidator(0,255,this);
+	ui->le_addr->setValidator(validator);
+	validator=new QIntValidator(1,255,this);
+	ui->le_slave_addr->setValidator(validator);
+	validator=new QIntValidator(1,123,this);
+	ui->le_num->setValidator(validator);
+	validator=new QIntValidator(0,65535,this);
+	ui->le_reg->setValidator(validator);
+	ui->le_06_val->setValidator(validator);
+}
+void MainWindow::timerEvent(QTimerEvent *event) //100Hz
+{
+	if(event->timerId() == timerid) //定时器调用，或触发
+	{
+		task_poll();
+		static u32 tick=0;
+		if(tick++%30==1)
+		{
+			regs_update_UI(); //首先看看有没有要更新UI的，然后看是否有UI指令
+			regs_update_data(); //将UI数据更新到数据
+			tasks_update_UI();
+			tasks_update_data(); //将UI数据更新到数据
+		}
+		if(tick%10==2) //10Hz
+		{
+			//刷新模式切换
+			int ui_is_master=ui->rb_wmod_master->isChecked()?1:0;
+			if(is_master==0 && ui_is_master==1) //若slave切换为master
+			{
+				ui->bt_start_task->setEnabled(true);
+				ui->bt_send->setEnabled(true);
+				ui->le_slave_addr->setEnabled(true);
+			}
+			else if(is_master==1 && ui_is_master==0) //若master切换为slave
+			{
+				ui->bt_start_task->setEnabled(false);
+				ui->bt_send->setEnabled(false);
+				ui->le_slave_addr->setEnabled(false);
+				//重新注册从机的寄存器
+				slave_md.address=ui->le_slave_addr->text().toInt();
+				//首先回收所有现有的任务结构
+				MODBUS_ADDR_LIST *pl=slave_md.addr_list;
+				slave_md.addr_list=0;
+				while(pl)
+				{
+					MODBUS_ADDR_LIST *del=pl;
+					delete pl->buf;
+					pl=pl->next;
+					delete del;
+				}
+				for(int i=0;i<regs_list.size();i++)
+				{
+					MODBUS_ADDR_LIST *paddrobj=new MODBUS_ADDR_LIST
+					{
+						regs_list[i].reg,1,new u16[1],0,
+						regs_list[i].addr,0,0,0,0,0,1
+					}; //modbus任务对象
+					slave_md.reg(paddrobj);
+				}
+			}
+			is_master=ui_is_master;
+			//刷新从模式的寄存器值
+			if(is_master==0)
+			{
+				MODBUS_ADDR_LIST *pl=slave_md.addr_list;
+				while(pl)
+				{
+					for(int i=0;i<pl->num;i++)
+					{
+						u16 reg=pl->st+i; //寄存器地址
+						for(int j=0;j<regs_list.size();j++)
+						{
+							if(regs_list[j].addr==slave_md.address &&
+								regs_list[j].reg==reg)
+							{
+								pl->buf[i]=regs_list[j].dbuf;
+								break;
+							}
+						}
+					}
+					pl=pl->next;
+				}
+			}
+		}
+	}
+}
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+}
+void MainWindow::slot_uart_rx() //串口接收
+{
+	char buf[128];
+	int n=1;
+	while(n)
+	{
+		n=uart->read(buf,sizeof(buf));
+		if(is_master) main_md.pack((u8*)buf,n);
+		else slave_md.pack((u8*)buf,n);
+	}
 }
 void MainWindow::slot_modbus_lostlock(u8 b) //modbus模块失锁
 {
@@ -115,6 +213,9 @@ void MainWindow::slot_update_a_reg(u8 addr,u16 reg,u16 d) //更新一个寄存�
 		}
 	}
 }
+/////////////////////////////////////////////////////////////////////////
+//					数据刷新
+////////////////////////////////////////////////////////////////////////////
 void MainWindow::regs_update_UI_row(int row) //刷新界面：寄存器
 {
 	ui->tw_regs->item(row, 0)->setText(regs_list[row].name.c_str());
@@ -352,42 +453,10 @@ void MainWindow::tasks_update_data(void) //从界面更新数据：任务列表
 		task_list[i].mdbs_buf.freq=freq_2_tick(t);
 	}
 }
-void MainWindow::timerEvent(QTimerEvent *event) //100Hz
-{
-	if(event->timerId() == timerid) //定时器调用，或触发
-	{
-		task_poll();
-		static u32 tick=0;
-		if(tick++%30==1)
-		{
-			regs_update_UI(); //首先看看有没有要更新UI的，然后看是否有UI指令
-			regs_update_data(); //将UI数据更新到数据
-			tasks_update_UI();
-			tasks_update_data(); //将UI数据更新到数据
-		}
-		if(tick%10==2) //10Hz
-		{
-		}
-	}
-}
-
-void MainWindow::closeEvent(QCloseEvent *event)
-{
-}
-
-void MainWindow::slot_uart_rx() //串口接收
-{
-	char buf[128];
-	int n=1;
-	while(n)
-	{
-		n=uart->read(buf,sizeof(buf));
-		main_md.pack((u8*)buf,n);
-	}
-}
 
 /////////////////////////////////////////////////////////////////////////
-//界面响应
+//					界面响应
+////////////////////////////////////////////////////////////////////////////
 void MainWindow::on_bt_open_uart_clicked()
 {
 	if(ui->bt_open_uart->text()=="打开串口")
@@ -418,7 +487,6 @@ void MainWindow::on_bt_fitscreen_clicked() //适应屏幕
 }
 ////////////////////////////////////////////////////////////////////////////
 //					任务部分
-////////////////////////////////////////////////////////////////////////////
 void MainWindow::on_bt_start_task_clicked() //开始周期任务
 {
 	if(ui->bt_start_task->text()=="开始周期任务")
@@ -431,6 +499,8 @@ void MainWindow::on_bt_start_task_clicked() //开始周期任务
 			ui->bt_import_cfg->setEnabled(false);
 			ui->bt_add_task->setEnabled(false);
 			ui->bt_del_task->setEnabled(false);
+			ui->rb_wmod_master->setEnabled(false);
+			ui->rb_wmod_slave->setEnabled(false);
 		}
 	}
 	else
@@ -441,6 +511,8 @@ void MainWindow::on_bt_start_task_clicked() //开始周期任务
 		ui->bt_import_cfg->setEnabled(true);
 		ui->bt_add_task->setEnabled(true);
 		ui->bt_del_task->setEnabled(true);
+		ui->rb_wmod_master->setEnabled(true);
+		ui->rb_wmod_slave->setEnabled(true);
 	}
 }
 void MainWindow::on_bt_add_task_clicked() //添加任务
@@ -498,12 +570,19 @@ void MainWindow::on_bt_send_clicked() //单次发送
 		vector<u8> v;
 		string s=ui->le_10_data->text().toStdString();
 		int r=str2bin(s.c_str(),s.size(),v);
-		if(r==0 && v.size()==single_task.mdbs_buf.num)
+		if(r==0 && v.size()==single_task.mdbs_buf.num*2)
 		{
+			for(int i=0;i<v.size();i+=2) //换端
+			{
+				u8 t=v[i];
+				v[i]=v[i+1];
+				v[i+1]=t;
+			}
 			memcpy(single_task.mdbs_buf.buf,&(v[0]),v.size());
 		}
 		else
 		{//错误
+			QMessageBox::information(this,"错误","数据数量错误");
 			return ;
 		}
 	}
@@ -514,10 +593,8 @@ void MainWindow::on_bt_send_clicked() //单次发送
 	main_md.reg(&(single_task.mdbs_buf)); //主机注册任务
 	is_running=3;
 }
-
 ////////////////////////////////////////////////////////////////////////////
 //					寄存器部分
-////////////////////////////////////////////////////////////////////////////
 void MainWindow::on_bt_add_reg_clicked() //添加寄存器
 {
 	CMReg tt;
@@ -602,3 +679,4 @@ void MainWindow::on_bt_save_cfg_clicked() //保存配置
 		cf.write((u8*)s.c_str(),s.size());
 	}
 }
+

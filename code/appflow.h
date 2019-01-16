@@ -112,6 +112,8 @@ extern void modbus_rxpack(u8 *p,int n); //modbus模块接收完整帧
 extern vector<CMReg> regs_list; //寄存器列表
 extern vector<CMTask> task_list; //任务列表
 extern CModbus_Master main_md;
+extern CModbus_Slave slave_md;
+extern int is_master; //是否是主模式
 extern int is_running; //是否正在运行
 
 int app_ini(Json::Value v); //将配置文件读入内存列表中

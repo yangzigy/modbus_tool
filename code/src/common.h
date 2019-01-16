@@ -277,7 +277,7 @@ public:
 		fromAddr.sin_family = AF_INET;
 		fromAddr.sin_addr.s_addr = inet_addr(ip.c_str());
 		fromAddr.sin_port = htons(rxport);
-		if (bind(sock, (struct sockaddr *) &fromAddr, sizeof(fromAddr)) < 0)
+		if (::bind(sock, (struct sockaddr *) &fromAddr, sizeof(fromAddr)) < 0)
 		{
 			log(TERROR,"failed to bind socket");
 		}
@@ -437,7 +437,9 @@ s64 get_file_size(FILE* fp);//获取文件长度
 FILE *com_fopen(const char *s,const char *flag);
 //调用shell
 void print_error(const char *name);//输出错误信息
+#if (!defined(WIN32) && !defined(WIN64))
 string com_popen(const char *scmd);//打开只读管道获取命令输出
+#endif
 int _system(const char *command); //不复制内存的调用方式
 
 class CComFile

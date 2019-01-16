@@ -15,6 +15,14 @@
 #include <string.h>
 #include <math.h>
 
+#define GCC_VERSION (__GNUC__ * 10000 \
+                     + __GNUC_MINOR__ * 100 \
+                     + __GNUC_PATCHLEVEL__)
+//#if GCC_VERSION > 30200 //GCC > 3.2.0
+#if (GCC_VERSION >= 40902) || (_MSC_VER >= 1900) //4.9.2以上
+#define USECPP11
+#endif
+
 #ifdef __cplusplus
 #include <iostream>
 #include <string>
@@ -22,20 +30,19 @@
 #include <sstream>
 #include <vector>
 #include <algorithm>
+#include <numeric>
+#include <list>
+#include <map>
+#ifdef USECPP11 
 #include <tuple>
 #include <regex>
 #include <random>
 #include <chrono>
 #include <thread>
 #include <future>
-#include <map>
+#endif
 using namespace std;
 #endif
-
-#define GCC_VERSION (__GNUC__ * 10000 \
-                     + __GNUC_MINOR__ * 100 \
-                     + __GNUC_PATCHLEVEL__)
-//#if GCC_VERSION > 30200 //GCC > 3.2.0
 
 typedef unsigned char u8;
 typedef unsigned short u16;
@@ -69,15 +76,15 @@ typedef signed long long t_maxs;
 					else \
 					{\
 						cout<<__FILE__<<':'<<__LINE__<<":\033[31m failed";\
-						cout<<" exp:"<<x<<",ect:"<<y;\
+						cout<<" exp:"<<(x)<<",ect:"<<(y);\
 					} cout<<"\033[0m\t"
-#define TEST_EQ(x,y)	TEST_ASSERT(x,y,x==y)
-#define TEST_FEQ(x,y)	TEST_ASSERT(x,y,fabs(x-y)<Eps) //浮点数的等于
-#define TEST_NEAR(x,y,e)	TEST_ASSERT(x,y,fabs(x-y)<e)
-#define TEST_LT(x,y)	TEST_ASSERT(x,y,x<y)
-#define TEST_GT(x,y)	TEST_ASSERT(x,y,x>y)
-#define TEST_LTEQ(x,y)	TEST_ASSERT(x,y,x<=y)
-#define TEST_GTEQ(x,y)	TEST_ASSERT(x,y,x>=y)
+#define TEST_EQ(x,y)	TEST_ASSERT(x,y,(x)==(y))
+#define TEST_FEQ(x,y)	TEST_ASSERT(x,y,fabs((x)-(y))<Eps) //浮点数的等于
+#define TEST_NEAR(x,y,e)	TEST_ASSERT(x,y,fabs((x)-(y))<e)
+#define TEST_LT(x,y)	TEST_ASSERT(x,y,(x)<(y))
+#define TEST_GT(x,y)	TEST_ASSERT(x,y,(x)>(y))
+#define TEST_LTEQ(x,y)	TEST_ASSERT(x,y,(x)<=(y))
+#define TEST_GTEQ(x,y)	TEST_ASSERT(x,y,(x)>=(y))
 
 #define CHECK_ASSERT(x,y,exp)	\
 					if(exp){}\
@@ -85,20 +92,20 @@ typedef signed long long t_maxs;
 					{\
 						cout<<endl;\
 						cout<<__FILE__<<':'<<__LINE__<<":\033[31m failed\033[0m";\
-						cout<<" exp:"<<x<<",ect:"<<y<<"\033[0m\t";\
+						cout<<" exp:"<<(x)<<",ect:"<<(y)<<"\033[0m\t";\
 					}
-#define CHECK_EQ(x,y)	CHECK_ASSERT(x,y,x==y)
-#define CHECK_FEQ(x,y)	CHECK_ASSERT(x,y,fabs(x-y)<Eps) //浮点数的等于
-#define CHECK_NEAR(x,y,e)	CHECK_ASSERT(x,y,fabs(x-y)<e)
-#define CHECK_LT(x,y)	CHECK_ASSERT(x,y,x<y)
-#define CHECK_GT(x,y)	CHECK_ASSERT(x,y,x>y)
-#define CHECK_LTEQ(x,y)	CHECK_ASSERT(x,y,x<=y)
-#define CHECK_GTEQ(x,y)	CHECK_ASSERT(x,y,x>=y)
+#define CHECK_EQ(x,y)	CHECK_ASSERT(x,y,(x)==(y))
+#define CHECK_FEQ(x,y)	CHECK_ASSERT(x,y,fabs((x)-(y))<Eps) //浮点数的等于
+#define CHECK_NEAR(x,y,e)	CHECK_ASSERT(x,y,fabs((x)-(y))<(e))
+#define CHECK_LT(x,y)	CHECK_ASSERT(x,y,(x)<(y))
+#define CHECK_GT(x,y)	CHECK_ASSERT(x,y,(x)>(y))
+#define CHECK_LTEQ(x,y)	CHECK_ASSERT(x,y,(x)<=(y))
+#define CHECK_GTEQ(x,y)	CHECK_ASSERT(x,y,(x)>=(y))
 
 //定义字节数量
-#define KB(x)	(1024*x)
-#define MB(x)	(1024*1024ll*x)
-#define GB(x)	(1024*1024ll*1024*x)
+#define KB(x)	(1024*(x))
+#define MB(x)	(1024*1024ll*(x))
+#define GB(x)	(1024*1024ll*1024*(x))
 
 //大小端转换
 #define CHANGE_END16(n) (u16)((((u16) (n)) << 8) | (((u16) (n)) >> 8))

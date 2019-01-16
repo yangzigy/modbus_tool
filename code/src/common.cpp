@@ -705,6 +705,8 @@ string read_textfile(const char *filename)
 	return buffer.str();
 }
 
+
+#ifdef __GNUC__
 string com_popen(const char *scmd)//打开只读管道获取命令输出
 {
 	FILE *fp=popen(scmd,"r");
@@ -733,6 +735,47 @@ string com_popen(const char *scmd)//打开只读管道获取命令输出
 	pclose(fp);
 	return s;
 }
+#endif
+#if (!defined(WIN32) && !defined(WIN64))
+int _system (const char *command) //不复制内存的调用方式
+{
+	int pid = 0;
+	int status = 0;
+	char *argv[4];
+	extern char **environ;
+	if(NULL==command)
+	{
+		return -1;
+	}
+	pid = vfork();
+	if(pid<0)
+	{
+		return -1;
+	}
+	if(0==pid)
+	{             //child process
+		argv[0] = "sh";
+		argv[1] = "-c";
+		argv[2] = (char*)command;
+		argv[3] = NULL;
+		execve("/bin/sh",argv,environ);// execve() also an implementation of exec() 
+		exit(127);
+	}
+	do //wait for child process to start
+	{
+		if(waitpid(pid,&status,0)<0)
+		{
+			//if(errno!=EINTR) { return -1; } else { return status;}
+			if(status!=0)
+			{
+				print_error("");
+			}
+			return status;
+		}
+	} while(1);
+	return 0;
+}
+#endif
 
 ///////////////////////////////////////////////////////////////////
 //6、python扩展
