@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>help.html</file>
+        <file>img/main_ui.jpg</file>
     </qresource>
 </RCC>

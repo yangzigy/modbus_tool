@@ -415,8 +415,8 @@ void MainWindow::tasks_create_UI(void) //从数据更新界面：任务列表
 	ui->tw_tasks->setColumnWidth(6,36);
 	ui->tw_tasks->setColumnWidth(7,50);
 	QStringList tasktype_list; //寄存器类型列表
-	tasktype_list.append("06");
-	tasktype_list.append("10");
+	//tasktype_list.append("06");
+	//tasktype_list.append("10");
 	tasktype_list.append("03");
 	tasktype_list.append("04");
 	for(int i=0;i<task_list.size();i++) //遍历所有任务
@@ -624,9 +624,10 @@ void MainWindow::on_bt_help_clicked() //帮助
 		return;
 	}
 	string nText =nFile.readAll().data();
+	nText=com_replace(nText,"src=\"","src=\"qrc:/");
 	//widget_help->setGeometry(100,100,400,500);
 	widget_help->setStyleSheet("font-size:14px;");
-	widget_help->setMinimumWidth(500);
+	widget_help->setMinimumWidth(800);
 	widget_help->setMinimumHeight(500);
 	widget_help->setHtml(nText.c_str());
 	widget_help->show();

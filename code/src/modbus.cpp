@@ -74,7 +74,7 @@ s64 CModbus_Master::pre_pack_len(u8 *b,s64 len)//返回整包长度
 	{
 		len=8; //主从都是8
 	}
-	else
+	else if(b[1]==3 || b[1]==4) //若是写单寄存器
 	{
 		len=b[2]+5;
 		if(len<6) len=6;
@@ -329,12 +329,12 @@ s64 CModbus_Slave::pro_pack(u8 * p,s64 len) //从机接收处理
 		send_len=send_err(p[1],8);
 	}
 END_SEND:
+	rx_fun(p,len);
 	if(send_len>2 && PACK.addr!=0) //若不是广播
 	{
 		*(u16*)(tx_buf+send_len-2)=GetModbusCRC16(tx_buf,send_len-2);
 		send_fun(tx_buf,send_len);
 	}
-	rx_fun(p,len);
 	return 0;
 }
 u8 CModbus_Slave::send_err(u8 cmd,u8 err)
