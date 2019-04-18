@@ -79,12 +79,12 @@ private slots:
 	void on_bt_send_clicked();
 	void on_bt_add_task_clicked();
 	void on_bt_fitscreen_clicked();
+	void on_bt_save_cfg_clicked();
 	void on_bt_add_reg_clicked();
 	void on_bt_del_task_clicked();
 	void on_bt_clear_data_clicked();
 	void on_bt_del_reg_clicked();
 	void on_bt_import_cfg_clicked();
-	void on_bt_save_cfg_clicked();
 };
 
 #endif // MAINWINDOW_H

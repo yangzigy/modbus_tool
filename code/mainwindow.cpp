@@ -198,7 +198,7 @@ void MainWindow::slot_update_a_reg(u8 addr,u16 reg,u16 d) //更新一个寄存�
 			//加入曲线
 			if(regs_list[i].is_curv) //若要显示曲线
 			{
-				int s_no=regs_list[i].addr*256+regs_list[i].reg;
+				int s_no=regs_list[i].addr*65536+regs_list[i].reg;
 				if(curv_map.count(s_no)>0 && curv_map[s_no]) //且曲线列表中有
 				{
 					u32 tmptime=com_time_getms();
@@ -208,6 +208,15 @@ void MainWindow::slot_update_a_reg(u8 addr,u16 reg,u16 d) //更新一个寄存�
 					}
 					curv_map[s_no]->append(tmptime-sttime,
 							regs_list[i].org_2_val(regs_list[i].dbuf));
+					//是否存盘
+					if(ui->cb_save_data->isChecked())
+					{
+						string s=sFormat("%d:%s:%.2f\n",tmptime-sttime,
+							curv_map[s_no]->name().toStdString().c_str(),
+							regs_list[i].org_2_val(regs_list[i].dbuf));
+						extern void rec_log(const char *ps); //记录日志或发出传感数据
+						rec_log(s.c_str());
+					}
 				}
 			}
 		}
@@ -332,7 +341,7 @@ void MainWindow::regs_update_data(void) //从界面更新数据：寄存器列�
 		regs_list[i].reg=ui->tw_regs->item(i, 4)->text().toInt();
 //4、曲线
 		regs_list[i].is_curv=ui->tw_regs->item(i, 5)->checkState()?1:0;
-		int s_no=regs_list[i].addr*256+regs_list[i].reg;
+		int s_no=regs_list[i].addr*65536+regs_list[i].reg;
 		if(regs_list[i].is_curv) //若要显示曲线
 		{
 			if(curv_map.count(s_no)<=0) //且曲线列表中没有
@@ -361,7 +370,7 @@ void MainWindow::regs_update_data(void) //从界面更新数据：寄存器列�
 		int i;
 		for(i=0;i<regs_list.size();i++)
 		{
-			int s_no=regs_list[i].addr*256+regs_list[i].reg;
+			int s_no=regs_list[i].addr*65536+regs_list[i].reg;
 			if(s_no==it.first && regs_list[i].is_curv) break;//若找到了
 		}
 		if(i==regs_list.size()) //若没找到
@@ -658,7 +667,6 @@ void MainWindow::on_bt_import_cfg_clicked() //导入配置
 		tasks_create_UI();
 	}
 }
-
 void MainWindow::on_bt_save_cfg_clicked() //保存配置
 {
 	auto name=QFileDialog::getSaveFileName (0,"","","txt文件(*.txt)");
@@ -680,4 +688,3 @@ void MainWindow::on_bt_save_cfg_clicked() //保存配置
 		cf.write((u8*)s.c_str(),s.size());
 	}
 }
-

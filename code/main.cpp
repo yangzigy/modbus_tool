@@ -61,3 +61,19 @@ int main(int argc, char *argv[])
     return a.exec();
 }
 
+CComFile flog;
+CDateTime date;
+void rec_log(const char *ps) //记录日志或发出传感数据
+{
+	if(flog.f)
+	{
+		int n=strlen(ps);
+		flog.write((void*)ps,n);
+		fflush(flog.f);
+	}
+	else
+	{
+		string name=date.Now("%Y%m%d_%H%M%S")+".txt";
+		flog.open(name.c_str(),"w");
+	}
+}

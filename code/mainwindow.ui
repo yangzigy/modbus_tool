@@ -458,14 +458,10 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="1">
-           <widget class="QPushButton" name="bt_del_reg">
-            <property name="text">
-             <string>删除寄存器</string>
-            </property>
-           </widget>
+          <item row="1" column="0" colspan="4">
+           <widget class="QTableWidget" name="tw_regs"/>
           </item>
-          <item row="0" column="2">
+          <item row="0" column="3">
            <spacer name="horizontalSpacer">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -478,8 +474,19 @@
             </property>
            </spacer>
           </item>
-          <item row="1" column="0" colspan="3">
-           <widget class="QTableWidget" name="tw_regs"/>
+          <item row="0" column="1">
+           <widget class="QPushButton" name="bt_del_reg">
+            <property name="text">
+             <string>删除寄存器</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QLabel" name="label_9">
+            <property name="text">
+             <string>值 = 原始值*系数 + 偏移</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -581,6 +588,16 @@ font: 75 14pt &quot;Microsoft JhengHei UI&quot;;</string>
            <widget class="QPushButton" name="bt_clear_data">
             <property name="text">
              <string>清除数据</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QCheckBox" name="cb_save_data">
+            <property name="text">
+             <string>保存数据</string>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
             </property>
            </widget>
           </item>
