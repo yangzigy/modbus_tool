@@ -65,7 +65,11 @@ public:
 		memset(&mdbs_buf,0,sizeof(mdbs_buf));
 	}
 	string name=""; //寄存器名称
+	int enable=0; //是否有效
+	float freq=1; //任务频率
+	u32 tick=0; //计数
 	MODBUS_ADDR_LIST mdbs_buf; //modbus任务对象
+	u8 task_buf[256]; //任务缓存
 	Json::Value toJson(void)
 	{
 		Json::Value v;
@@ -74,7 +78,7 @@ public:
 		v["reg"]=mdbs_buf.st;
 		v["type"]=mdbs_buf.type;
 		v["num"]=mdbs_buf.num;
-		v["fre"]=tick_2_freq(mdbs_buf.freq);
+		v["fre"]=freq;
 		return v;
 	}
 	int fromJson(Json::Value &v)
@@ -90,15 +94,12 @@ public:
 			mdbs_buf.st=v["reg"].asInt();
 			mdbs_buf.type=v["type"].asInt();
 			mdbs_buf.num=v["num"].asInt();
-			mdbs_buf.freq=freq_2_tick(v["fre"].asDouble());
+			freq=v["fre"].asDouble();
 			mdbs_buf.addr=v["addr"].asInt();
-			if(mdbs_buf.buf) delete mdbs_buf.buf;
-			mdbs_buf.buf=new u16[mdbs_buf.num];
-			mdbs_buf.next=0;
-			mdbs_buf.tick=0;
+			mdbs_buf.buf=(u16*)task_buf;
 			mdbs_buf.err=0;
 			mdbs_buf.stat=0;
-			mdbs_buf.enable=1;
+			enable=1;
 			return 0;
 		}
 		return 1;

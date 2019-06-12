@@ -2,13 +2,14 @@
 文件名：modbus.h
 时间：2017-7-18
 功能：
-
+	modbus的主从实现，内存部分使用小端存储
 */
 #ifndef MODBUS_H
 #define MODBUS_H
 
 #include "main.h"
 #include "comm_pack.h"
+#include "queue_cpp.h"
 
 //实现的帧：全部大端存储
 //04：读输入寄存器，8字节
@@ -50,21 +51,17 @@ typedef struct
 } MODBUS_RTU_REQ;//modbus rtu的查询帧
 #pragma pack()
 
-typedef struct _tag_MODBUS_ADDR_LIST//modbus地址列表
+typedef struct //modbus任务结构
 { //作为从机的寄存器列表
 	u16 st; //起始地址
 	u16 num;//此数组中地址个数
 	u16 *buf; //数据缓存
-	struct _tag_MODBUS_ADDR_LIST *next;
 /////////////////////////////////
 //作为主机的任务列表
 	u8 addr; //地址
 	u8 type; //任务类型(04 03)
-	u16 freq; //任务执行频率,tick数量，若为0，则为单次任务
-	u16 tick; //计时,1开始，单次触发任务需要写2
-	u8 err; //0无错，1无回应，2错误回复
-	u8 stat; //0空闲，1正在发送，2正确回复
-	u8 enable; //是否使能
+	u8 stat; //0待执行，1正在发送，2正确回复,3超时，4错误回复
+	u8 err; //错误码
 } MODBUS_ADDR_LIST; //也用作任务列表
 
 #define MAX_REG_NUM		123 //最大单次请求寄存器数量
@@ -79,14 +76,12 @@ public:
 	void (*send_fun)(u8 *p,int n);//发送函数
 	void (*rx_fun)(u8 *p,int n);//接收回调函数
 	void (*lostlock_fun)(u8 *p,int n);//失锁回调函数
-	MODBUS_ADDR_LIST *addr_list; //主机任务列表，或从机地址列表
 	CModbus()
 	{
 		address=1;
 		send_fun=modbus_send_void;
 		rx_fun=modbus_send_void;
 		lostlock_fun=modbus_send_void;
-		addr_list=0;
 
 		rec_buff=headbuf;
 		buf_len=sizeof(headbuf);
@@ -98,8 +93,6 @@ public:
 		pre_offset=3;
 		pre_p=0;
 	}
-	void reg(MODBUS_ADDR_LIST *a); //向模块注册周期任务，或地址
-	u16 *get_data(u16 a); //从地址获得数据,输入小端地址
 	virtual void lostlock_cb(u8 b)//失锁回调
 	{
 		lostlock_fun(&b,1);
@@ -110,15 +103,24 @@ public:
 //接收数据：存在数据缓存中
 class CModbus_Master : public CModbus
 {
-public:
-	CModbus_Master() : CModbus()
+public: //构造需要初始化队列
+	CModbus_Master(MODBUS_ADDR_LIST **p,int n) : CModbus()
 	{
 		pre_offset=3;
+		timeout=2;
+		timetick=0;
+		//初始化队列
+		q_task.q_data=p;
+		q_task.buflen=n;
 	}
-	MODBUS_ADDR_LIST *cur_send; //当前等待的任务
+	u16 timeout; //超时周期数
+	u16 timetick; //任务经过的周期数
+	CQueue<MODBUS_ADDR_LIST *> q_task; //任务队列
+	MODBUS_ADDR_LIST *cur_task; //当前任务
 	virtual s64 pre_pack_len(u8 *b,s64 len);//返回整包长度
 	virtual s64 pro_pack(u8 * b,s64 len);//返回是否正确接收
 	int host_send(u8 addr,u8 fun,u16 st,u16 num,u16 *d); //当发06时，num为寄存器值
+	int add_task(MODBUS_ADDR_LIST *pt); //加入一个任务
 	void poll(void); //周期函数，主机通过周期函数进行发送
 };
 //从：
@@ -129,10 +131,16 @@ class CModbus_Slave : public CModbus
 public:
 	CModbus_Slave() : CModbus()
 	{
+		addr_list=0;
+		addr_list_n=0;
 		pre_offset=7;
 	}
+	MODBUS_ADDR_LIST *addr_list; //从机地址列表
+	u32 addr_list_n; //地址列表长度
 	virtual s64 pre_pack_len(u8 *b,s64 len);//返回整包长度
 	virtual s64 pro_pack(u8 * b,s64 len);//返回是否正确接收
+	void reg(MODBUS_ADDR_LIST *a,u32 n); //向模块注册地址
+	u16 *get_data(u16 a); //从地址获得数据,输入小端地址
 	u8 send_err(u8 cmd,u8 err);
 };
 

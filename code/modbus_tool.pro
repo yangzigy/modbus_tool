@@ -41,7 +41,8 @@ HEADERS += \
     ./src/modbus.h \
     ./src/main.h \ 
     colorlog.h \
-    src/hexstr.h
+    src/hexstr.h \
+    src/queue_cpp.h
 
 FORMS += \
         mainwindow.ui 

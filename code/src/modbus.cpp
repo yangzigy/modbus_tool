@@ -32,31 +32,6 @@ u16 GetModbusCRC16(u8 *cp,int leng)
 	return (u16)crc;
 }
 void modbus_send_void(u8 *p,int n){};
-void CModbus::reg(MODBUS_ADDR_LIST *a) //向模块注册地址
-{
-	MODBUS_ADDR_LIST *tmp=addr_list;
-	while(tmp)
-	{
-		if(tmp==a) return;
-		tmp=tmp->next;
-	}
-	a->next=addr_list;
-	addr_list=a;
-}
-u16 *CModbus::get_data(u16 a) //从地址获得数据,输入小端地址
-{
-	MODBUS_ADDR_LIST *tmp=addr_list;
-	while(tmp)
-	{
-		if(a>=tmp->st && a<(tmp->st+tmp->num)) //若地址在这个段
-		{
-			a=a-tmp->st; //相对索引
-			return tmp->buf+a;
-		}
-		tmp=tmp->next;
-	}
-	return 0;
-}
 ///////////////////////////////////////////////////////////////////////////
 //				主机
 ///////////////////////////////////////////////////////////////////////////
@@ -93,33 +68,36 @@ s64 CModbus_Master::pro_pack(u8 *p,s64 len)  //主机接收处理
 	{
 		return 1;
 	}
-	int r=0;
-	if(cur_send==0) goto END;
-	cur_send->err=0;
-	if(p[1]==4 || p[1]==3) //读输入
+	if(cur_task==0 || p[0]!=cur_task->addr) return 0;//若没有任务，纯接收，则不收
+	if(p[1] & 0x80) //若是错误
+	{
+		cur_task->stat=4; //4错误回复
+		cur_task->err=p[1] & 0x7f;
+	}
+	else if(p[1]==4 || p[1]==3) //读输入
 	{
 		if(p[2]!=CHANGE_END16(TP.num)*2)
 		{
-			goto END;
+			return 0;
 		}
+		//将收到的数据放在客户提供的缓存中
 		int i;
-		for(i=0;i<cur_send->num;i++)
+		for(i=0;i<cur_task->num;i++)
 		{
-			cur_send->buf[i]=CHANGE_END16(MODBUS_RX_DATA[i]);
+			cur_task->buf[i]=CHANGE_END16(MODBUS_RX_DATA[i]);
 		}
-		cur_send->stat=2;
+		cur_task->stat=2; //2正确回复
 	}
-	else if(p[1]==0x06 || p[1]==0x10) //写寄存器
+	else if(p[1]==0x06) //写单寄存器
 	{
-		cur_send->stat=2;
+		cur_task->stat=2; //2正确回复
 	}
-	else //若是错误回复
+	else if(p[1]==0x10) //多个写入
 	{
-		cur_send->err=p[2];
+		cur_task->stat=2; //2正确回复
 	}
-END:
 	rx_fun(p,len);
-	return r;
+	return 0;
 }
 int CModbus_Master::host_send(u8 addr,u8 fun,u16 st,u16 num,u16 *d) //
 {
@@ -159,48 +137,32 @@ int CModbus_Master::host_send(u8 addr,u8 fun,u16 st,u16 num,u16 *d) //
 }
 void CModbus_Master::poll(void) //周期函数，主机通过周期函数进行发送
 {
-	MODBUS_ADDR_LIST *tmp=addr_list;
-	MODBUS_ADDR_LIST *psend=0;
-	while(tmp) //对于每一个任务
+	if(cur_task && cur_task->stat==1) //若有任务正在执行
 	{
-		if(tmp->enable==0) //若未使能，下一个
+		if(timetick>=timeout) //若超时
 		{
-			tmp=tmp->next;
-			continue;
+			cur_task->stat=3; //3超时
+			cur_task=0;
 		}
-		if(tmp->freq==0) //若是单次任务
-		{
-			if(tmp->tick>1) //有值就应该发送
-			{
-				psend=tmp;
-			}
-		}
-		else if(tmp->tick>=tmp->freq) //不是单次，且需要发送
-		{
-			psend=tmp;
-		}
-		else //不是单次，也不用发送
-		{
-			tmp->tick++;
-		}
-		//判断各任务的正确性
-		if(tmp->stat==1) //若上次正在发送，现在没有接收
-		{
-			tmp->err=0xff;
-		}
-		tmp->stat=0; //清空为空闲状态
-		tmp=tmp->next;
+		timetick++;
 	}
-	if(psend) //若有任务需要发送
+	else //若在空闲状态,或者已经收到回复了
 	{
-		psend->tick=1;
-		host_send(psend->addr,psend->type,psend->st,psend->num,psend->buf);
-		psend->stat=1;
-		cur_send=psend; //有新任务才改变，否则就一直等
-		//先清空接收变量
-		pre_p=0;
+		cur_task=0;
+		int r=q_task.Queue_get(cur_task);
+		if(!r) //若有任务
+		{
+			timetick=0;
+			host_send(cur_task->addr,cur_task->type,cur_task->st,cur_task->num,cur_task->buf);
+			cur_task->stat=1; //1正在发送
+			//先清空接收变量
+			pre_p=0;
+		}
 	}
-	//cur_send=psend;
+}
+int CModbus_Master::add_task(MODBUS_ADDR_LIST *pt) //加入一个任务
+{
+	return q_task.Queue_set(pt);
 }
 ///////////////////////////////////////////////////////////////////////////
 //				从机
@@ -226,8 +188,8 @@ s64 CModbus_Slave::pre_pack_len(u8 *b,s64 len)//返回整包长度
 }
 s64 CModbus_Slave::pro_pack(u8 * p,s64 len) //从机接收处理
 {
-	int err=0;
 	int i;
+	u8 err=0;
 	u16 crc=0;
 	u8 send_len=0; //发送字节数
 	if(len<8) //长度错误
@@ -339,11 +301,28 @@ END_SEND:
 }
 u8 CModbus_Slave::send_err(u8 cmd,u8 err)
 {
-	u16 crc;
 	TP.addr=address;
 	TP.fun=cmd | 0x80;
 	tx_buf[2]=err;
 	return 5;
+}
+void CModbus_Slave::reg(MODBUS_ADDR_LIST *a,u32 n) //向模块注册地址
+{
+	addr_list=a;
+	addr_list_n=n;
+}
+u16 *CModbus_Slave::get_data(u16 a) //从地址获得数据,输入小端地址
+{
+	int i;
+	for(i=0;i<addr_list_n;i++)
+	{
+		if(a>=addr_list[i].st && a<(addr_list[i].st+addr_list[i].num)) //若地址在这个段
+		{
+			a=a-addr_list[i].st; //相对索引
+			return addr_list[i].buf+a;
+		}
+	}
+	return 0;
 }
 ////////////////////////////////////////////////////////////////////////////
 

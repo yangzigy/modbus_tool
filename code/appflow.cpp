@@ -7,7 +7,8 @@ vector<CMReg> regs_list; //寄存器列表
 vector<CMTask> task_list; //任务列表
 
 //运行对象
-CModbus_Master main_md;
+static MODBUS_ADDR_LIST *md_q_buf[10]; //最多几个任务等待
+CModbus_Master main_md(md_q_buf,sizeof(md_q_buf)/sizeof(MODBUS_ADDR_LIST*));
 CModbus_Slave slave_md;
 int is_master=1; //是否是主模式
 int is_running=0; //是否正在运行
@@ -19,13 +20,13 @@ float tick_2_freq(u16 tick) //间隔转换成频率
 {
 	return tick>0?(100.0f/tick):0;
 }
-#define MCS		(*(main_md.cur_send))
+#define MCS		(*(main_md.cur_task))
 void mdbs_rxcb(u8 *p,int n)//接收回调函数
 {
 	//接收回调进入日志
 	modbus_rxpack(p,n);
 	//判断是否是读
-	if(main_md.cur_send==0) return ;
+	if(main_md.cur_task==0) return ;
 	if(MCS.type==4 || MCS.type==3)
 	{
 		//拿到当前任务，将任务缓存中的数据更新
@@ -92,40 +93,28 @@ void app_master_slave(int m) //切换主从模式
 //////////////////////////////////////////////////////////////////////////////////
 void task_start(void) //开始任务,将任务列表中的任务变成modbus模块的任务
 {
-	//将任务列表中的任务变成modbus模块的任务
-	if(is_running || main_md.addr_list) //若开始前还没清理干净，就让关闭函数清理一遍
-	{
-		is_running=2;
-		return ;
-	}
-	for(auto &it:task_list) //现在main_md的addr_list是空的
-	{
-		main_md.reg(&(it.mdbs_buf)); //主机注册任务
-	}
 	//开始执行
 	is_running=1;
 }
 void task_stop(void) //结束任务
 {
-	is_running=2; //结束指令
+	is_running=0; //结束指令
 }
 void task_poll(void) //任务周期函数，100Hz
 {
-	if(is_running==2)
+	main_md.poll();
+	if(is_running==1) //若在运行状态
 	{
-		is_running=0;
-		//调用已经关闭任务的处理
-		//这是下一次调用，回复已经超时
-		main_md.addr_list=0;
-	}
-	else if(is_running==1) //若在运行状态
-	{
-		main_md.poll();
-	}
-	else if(is_running==3) //单次任务
-	{
-		main_md.poll();
-		is_running=2;
+		for(auto &it:task_list)
+		{
+			if(it.enable==0) continue;
+			it.tick++;
+			if(it.tick>=freq_2_tick(it.freq)) //若到了该发送的时间
+			{
+				it.tick=0;
+				main_md.add_task(&(it.mdbs_buf)); //由于界面保证了执行任务时任务列表不变,所以可以引用
+			}
+		}
 	}
 }
 

@@ -118,46 +118,50 @@ void MainWindow::timerEvent(QTimerEvent *event) //100Hz
 				//重新注册从机的寄存器
 				slave_md.address=ui->le_slave_addr->text().toInt();
 				//首先回收所有现有的任务结构
-				MODBUS_ADDR_LIST *pl=slave_md.addr_list;
-				slave_md.addr_list=0;
-				while(pl)
-				{
-					MODBUS_ADDR_LIST *del=pl;
-					delete pl->buf;
-					pl=pl->next;
-					delete del;
+				if(slave_md.addr_list)
+				{ //要记得删除数据缓存，数据缓存必须new，因为regs_list是动态的
+					for(int i=0;i<slave_md.addr_list_n;i++)
+					{
+						delete slave_md.addr_list[i].buf;
+					}
+					delete[] slave_md.addr_list;
 				}
+				slave_md.addr_list=0; slave_md.addr_list_n=0;
+				//建立新的结构
+				MODBUS_ADDR_LIST *pt=new MODBUS_ADDR_LIST[regs_list.size()];
 				for(int i=0;i<regs_list.size();i++)
 				{
-					MODBUS_ADDR_LIST *paddrobj=new MODBUS_ADDR_LIST
-					{
-						regs_list[i].reg,1,new u16[1],0,
-						regs_list[i].addr,0,0,0,0,0,1
-					}; //modbus任务对象
-					slave_md.reg(paddrobj);
+					pt[i].st=regs_list[i].reg;
+					pt[i].num=1;
+					pt[i].buf=new u16[1];
+					pt[i].addr=regs_list[i].addr;
+					pt[i].type=0;
+					pt[i].stat=0;
+					pt[i].err=0;
+					pt[i].buf[0]=regs_list[i].dbuf;
 				}
+				slave_md.reg(pt,regs_list.size());
 			}
 			is_master=ui_is_master;
 			//刷新从模式的寄存器值
-			if(is_master==0)
+			if(is_master==0) //若是从模式
 			{
 				MODBUS_ADDR_LIST *pl=slave_md.addr_list;
-				while(pl)
+				for(int k=0;k<slave_md.addr_list_n;k++) //对于所有的从模式地址列表（一般一个地址列表就是一个寄存器）
 				{
-					for(int i=0;i<pl->num;i++)
+					for(int i=0;i<pl[k].num;i++) //对于每个地址列表中的寄存器（一般为1）
 					{
-						u16 reg=pl->st+i; //寄存器地址
-						for(int j=0;j<regs_list.size();j++)
+						u16 reg=pl[k].st+i; //寄存器地址
+						for(int j=0;j<regs_list.size();j++) //在所有寄存器列表中找此寄存器
 						{
 							if(regs_list[j].addr==slave_md.address &&
 								regs_list[j].reg==reg)
 							{
-								pl->buf[i]=regs_list[j].dbuf;
+								pl[k].buf[i]=regs_list[j].dbuf;
 								break;
 							}
 						}
 					}
-					pl=pl->next;
 				}
 			}
 		}
@@ -386,26 +390,35 @@ void MainWindow::regs_update_data(void) //从界面更新数据：寄存器列�
 	}
 }
 /////////////////////////////////////////////////////////////////////////
+string get_task_stat_str(MODBUS_ADDR_LIST &task)
+{
+	const char *ttab[]={"待执行","发送中","正确","超时","错误"};
+	u8 stat=task.stat;
+	string s="";
+	if(stat>=4) s=sFormat("err:%02X",task.err);
+	else s=ttab[stat];
+	return s;
+}
 void MainWindow::tasks_update_UI_row(int row) //刷新界面：任务
 {
-	ui->tw_tasks->item(row, 0)->setCheckState(task_list[row].mdbs_buf.enable?Qt::Checked : Qt::Unchecked);
+	ui->tw_tasks->item(row, 0)->setCheckState(task_list[row].enable?Qt::Checked : Qt::Unchecked);
 	ui->tw_tasks->item(row, 1)->setText(task_list[row].name.c_str());
 	ui->tw_tasks->item(row, 2)->setText(QString().sprintf("%d",task_list[row].mdbs_buf.addr));
 	ui->tw_tasks->item(row, 3)->setText(QString().sprintf("%d",task_list[row].mdbs_buf.st));
 	((QComboBox *)(ui->tw_tasks->cellWidget(row, 4)))->setCurrentText(QString().sprintf("%02X",task_list[row].mdbs_buf.type));
 	ui->tw_tasks->item(row, 5)->setText(QString().sprintf("%d",task_list[row].mdbs_buf.num));
 	ui->tw_tasks->item(row, 6)->setText(
-			sFormat("%.1f",tick_2_freq(task_list[row].mdbs_buf.freq)).c_str());
-	const char *ttab[]={"正常","错误","无应答"};
-	ui->tw_tasks->item(row, 7)->setText(ttab[(int)((task_list[row].mdbs_buf.err+254)/254.1)]);
+			sFormat("%.1f",task_list[row].freq).c_str());
+	string s=get_task_stat_str(task_list[row].mdbs_buf);
+	ui->tw_tasks->item(row, 7)->setText(s.c_str());
 }
 void MainWindow::tasks_update_UI(void) //刷新界面：任务
 {
 	//任务界面基本只接收指令，数据更新只有状态
 	for(int i=0;i<task_list.size();i++) //遍历所有任务
 	{
-		const char *ttab[]={"正常","错误","无应答"};
-		ui->tw_tasks->item(i, 7)->setText(ttab[(int)((task_list[i].mdbs_buf.err+254)/254.1)]);
+		string s=get_task_stat_str(task_list[i].mdbs_buf);
+		ui->tw_tasks->item(i, 7)->setText(s.c_str());
 	}
 }
 void MainWindow::tasks_create_UI(void) //从数据更新界面：任务列表
@@ -452,14 +465,14 @@ void MainWindow::tasks_update_data(void) //从界面更新数据：任务列表
 	for(int i=0;i<row;i++) //对于每一行
 	{
 		bool b;
-		task_list[i].mdbs_buf.enable=ui->tw_tasks->item(i, 0)->checkState()==Qt::Checked?1:0;
+		task_list[i].enable=ui->tw_tasks->item(i, 0)->checkState()==Qt::Checked?1:0;
 		task_list[i].name=ui->tw_tasks->item(i, 1)->text().toStdString();
 		task_list[i].mdbs_buf.addr=ui->tw_tasks->item(i, 2)->text().toInt();
 		task_list[i].mdbs_buf.st=ui->tw_tasks->item(i, 3)->text().toInt();
 		task_list[i].mdbs_buf.type=((QComboBox *)(ui->tw_tasks->cellWidget(i, 4)))->currentText().toInt(&b,16);
 		task_list[i].mdbs_buf.num=ui->tw_tasks->item(i, 5)->text().toInt();
 		float t=ui->tw_tasks->item(i, 6)->text().toFloat();
-		task_list[i].mdbs_buf.freq=freq_2_tick(t);
+		task_list[i].freq=t;
 	}
 }
 
@@ -527,7 +540,6 @@ void MainWindow::on_bt_start_task_clicked() //开始周期任务
 void MainWindow::on_bt_add_task_clicked() //添加任务
 {
 	CMTask tt; //
-	tt.mdbs_buf.enable=0;
 	task_list.push_back(tt);
 	tasks_create_UI();
 }
@@ -543,6 +555,7 @@ void MainWindow::on_bt_del_task_clicked() //删除任务
 	}
 }
 CMTask single_task; //单次发送任务
+u8 single_task_buf[256];
 void MainWindow::on_bt_send_clicked() //单次发送
 {
 	if(is_running!=0) //只能在结束状态下使用
@@ -565,10 +578,11 @@ void MainWindow::on_bt_send_clicked() //单次发送
 	}
 	else
 	{
-		single_task.mdbs_buf.num=ui->le_num->text().toInt();
+		int num=ui->le_num->text().toInt();
+		MINMAX(num,1,MAX_REG_NUM);
+		single_task.mdbs_buf.num=num;
 	}
-	if(single_task.mdbs_buf.buf) delete[] single_task.mdbs_buf.buf; //缓存
-	single_task.mdbs_buf.buf=new u16[single_task.mdbs_buf.num];
+	single_task.mdbs_buf.buf=(u16*)single_task_buf;
 	if(single_task.mdbs_buf.type==6) //若写单
 	{
 		bool b;
@@ -595,12 +609,10 @@ void MainWindow::on_bt_send_clicked() //单次发送
 			return ;
 		}
 	}
-	single_task.mdbs_buf.freq=1;
-	single_task.mdbs_buf.enable=1;
+	single_task.enable=1;
 
 	//注册，开始
-	main_md.reg(&(single_task.mdbs_buf)); //主机注册任务
-	is_running=3;
+	main_md.add_task(&(single_task.mdbs_buf)); //主机注册任务
 }
 ////////////////////////////////////////////////////////////////////////////
 //					寄存器部分
@@ -610,7 +622,6 @@ void MainWindow::on_bt_add_reg_clicked() //添加寄存器
 	regs_list.push_back(tt);
 	regs_create_UI();
 }
-
 void MainWindow::on_bt_del_reg_clicked() //删除寄存器
 {
 	//删除当前选中的任务
