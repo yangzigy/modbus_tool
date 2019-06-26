@@ -79,6 +79,7 @@ private slots:
 	void on_bt_send_clicked();
 	void on_bt_add_task_clicked();
 	void on_bt_fitscreen_clicked();
+	void on_bt_overtime_10ms_clicked();
 	void on_bt_save_cfg_clicked();
 	void on_bt_add_reg_clicked();
 	void on_bt_del_task_clicked();

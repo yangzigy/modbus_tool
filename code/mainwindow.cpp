@@ -554,6 +554,19 @@ void MainWindow::on_bt_del_task_clicked() //删除任务
 		tasks_create_UI();
 	}
 }
+void MainWindow::on_bt_overtime_10ms_clicked() //设置超时时间
+{
+	bool b=false;
+	int ot=ui->le_overtime_10ms->text().toInt(&b);
+	if(b)
+	{
+		main_md.timeout=ot;
+	}
+	else
+	{
+		QMessageBox::warning(this,"输入错误","超时时间单位10ms，整数");
+	}
+}
 CMTask single_task; //单次发送任务
 u8 single_task_buf[256];
 void MainWindow::on_bt_send_clicked() //单次发送
