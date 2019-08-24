@@ -31,6 +31,8 @@ public:
 	~MainWindow();
 	Ui::MainWindow *ui;
 	void ui_initial();
+	//刷新注册寄存器
+	void reg_create_slavelist(void); //从UI创建从模式的寄存器列表
 	//增删时全部重做：
 	void regs_create_UI(void); //从数据更新界面：寄存器列表
 	void tasks_create_UI(void); //从数据更新界面：任务列表

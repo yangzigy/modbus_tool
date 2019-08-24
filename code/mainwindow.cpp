@@ -115,32 +115,6 @@ void MainWindow::timerEvent(QTimerEvent *event) //100Hz
 				ui->bt_start_task->setEnabled(false);
 				ui->bt_send->setEnabled(false);
 				ui->le_slave_addr->setEnabled(false);
-				//重新注册从机的寄存器
-				slave_md.address=ui->le_slave_addr->text().toInt();
-				//首先回收所有现有的任务结构
-				if(slave_md.addr_list)
-				{ //要记得删除数据缓存，数据缓存必须new，因为regs_list是动态的
-					for(int i=0;i<slave_md.addr_list_n;i++)
-					{
-						delete slave_md.addr_list[i].buf;
-					}
-					delete[] slave_md.addr_list;
-				}
-				slave_md.addr_list=0; slave_md.addr_list_n=0;
-				//建立新的结构
-				MODBUS_ADDR_LIST *pt=new MODBUS_ADDR_LIST[regs_list.size()];
-				for(int i=0;i<regs_list.size();i++)
-				{
-					pt[i].st=regs_list[i].reg;
-					pt[i].num=1;
-					pt[i].buf=new u16[1];
-					pt[i].addr=regs_list[i].addr;
-					pt[i].type=0;
-					pt[i].stat=0;
-					pt[i].err=0;
-					pt[i].buf[0]=regs_list[i].dbuf;
-				}
-				slave_md.reg(pt,regs_list.size());
 			}
 			is_master=ui_is_master;
 			//刷新从模式的寄存器值
@@ -306,6 +280,7 @@ void MainWindow::regs_create_UI(void) //从数据更新界面：寄存器列表
 		item = new QTableWidgetItem(); ui->tw_regs->setItem(i, 7, item);
 		regs_update_UI_row(i);
 	}
+	reg_create_slavelist(); //更新slave的注册寄存器
 }
 void MainWindow::regs_update_data(void) //从界面更新数据：寄存器列表
 {
@@ -343,6 +318,11 @@ void MainWindow::regs_update_data(void) //从界面更新数据：寄存器列�
 //3、若修改了寄存器
 		regs_list[i].addr=ui->tw_regs->item(i,3)->text().toInt();
 		regs_list[i].reg=ui->tw_regs->item(i, 4)->text().toInt();
+		for(int i=0;i<slave_md.addr_list_n;i++) //更新slave的注册寄存器
+		{
+			slave_md.addr_list[i].addr=regs_list[i].addr;
+			slave_md.addr_list[i].st=regs_list[i].reg;
+		}
 //4、曲线
 		regs_list[i].is_curv=ui->tw_regs->item(i, 5)->checkState()?1:0;
 		int s_no=regs_list[i].addr*65536+regs_list[i].reg;
@@ -712,3 +692,33 @@ void MainWindow::on_bt_save_cfg_clicked() //保存配置
 		cf.write((u8*)s.c_str(),s.size());
 	}
 }
+void MainWindow::reg_create_slavelist(void) //从UI创建从模式的寄存器列表
+{
+	//重新注册从机的寄存器
+	slave_md.address=ui->le_slave_addr->text().toInt();
+	//首先回收所有现有的任务结构
+	if(slave_md.addr_list)
+	{ //要记得删除数据缓存，数据缓存必须new，因为regs_list是动态的
+		for(int i=0;i<slave_md.addr_list_n;i++)
+		{
+			delete slave_md.addr_list[i].buf;
+		}
+		delete[] slave_md.addr_list;
+	}
+	slave_md.addr_list=0; slave_md.addr_list_n=0;
+	//建立新的结构
+	MODBUS_ADDR_LIST *pt=new MODBUS_ADDR_LIST[regs_list.size()];
+	for(int i=0;i<regs_list.size();i++)
+	{
+		pt[i].st=regs_list[i].reg;
+		pt[i].num=1;
+		pt[i].buf=new u16[1];
+		pt[i].addr=regs_list[i].addr;
+		pt[i].type=0;
+		pt[i].stat=0;
+		pt[i].err=0;
+		pt[i].buf[0]=regs_list[i].dbuf;
+	}
+	slave_md.reg(pt,regs_list.size());
+}
+
