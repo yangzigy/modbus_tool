@@ -25,17 +25,16 @@ public:
 		//insertHtml("<span style=\"color:green;background-color:blue\">This is some text!</span>");
 	}
 	int stat=0; //0:tx,1:rx,2:lost
-	u32 total_len=0; //总字符数
-	void check_len(u32 addlen) //增加的长度
+	string str_buf; //字符缓冲，避免操作qt对象，qt对象会动
+	void check_len(void) //增加的长度
 	{
-		total_len+=addlen;
-		if(total_len>MB(10)) //若超过限制，则进行限制
+		if(str_buf.size()>KB(30)) //若超过限制，则进行限制
 		{
-			QString	ht=toHtml();
-			cout<<"html size "<<ht.size()<<endl;
-			int p=ht.indexOf("<br/>",ht.size()*2/3);
-			ht.remove(0,p);
-			setHtml(ht);
+			int p=str_buf.find("<br/>", str_buf.size()/3);
+			printf("p:%d,len:%d\n",p,str_buf.size());
+			if(p<=0) return ;
+			str_buf=str_buf.substr(p,str_buf.size()-p);
+			setHtml(str_buf.c_str());
 		}
 		QScrollBar *scrollbar = verticalScrollBar();
 		if(scrollbar)
@@ -65,8 +64,10 @@ public:
 		}
 		//CRC
 		pbuf+=sprintf(pbuf,"%02X %02X",p[pp],p[pp+1]);
-		insertHtml(sbuf);
-		check_len(pbuf-sbuf);
+		str_buf+=sbuf;
+		setHtml(str_buf.c_str());
+		//insertHtml(sbuf);
+		check_len();
 		stat=0;
 	}
 	void rx_lostlock(u8 *p,int n) //接收失锁数据
@@ -88,8 +89,9 @@ public:
 				lllen=0;
 			}
 		}
-		insertHtml(sbuf);
-		check_len(pbuf-sbuf);
+		str_buf+=sbuf;
+		setHtml(str_buf.c_str());
+		check_len();
 		stat=2;
 	}
 	void rx_pack(u8 *p,int n) //接收数据
@@ -122,8 +124,9 @@ public:
 		}
 		//CRC
 		pbuf+=sprintf(pbuf,"%02X %02X",p[pp],p[pp+1]);
-		insertHtml(sbuf);
-		check_len(pbuf-sbuf);
+		str_buf+=sbuf;
+		setHtml(str_buf.c_str());
+		check_len();
 		stat=1;
 	}
 	void tx_slave_pack(u8 *p,int n) //从机发送数据
@@ -156,8 +159,9 @@ public:
 		}
 		//CRC
 		pbuf+=sprintf(pbuf,"%02X %02X",p[pp],p[pp+1]);
-		insertHtml(sbuf);
-		check_len(pbuf-sbuf);
+		str_buf+=sbuf;
+		setHtml(str_buf.c_str());
+		check_len();
 		stat=1;
 	}
 };

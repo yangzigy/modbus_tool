@@ -63,6 +63,17 @@ public:
 	CMTask()
 	{
 		memset(&mdbs_buf,0,sizeof(mdbs_buf));
+		mdbs_buf.buf=(u16*)task_buf;
+	}
+	CMTask(const CMTask &t)
+	{
+		name=t.name;
+		enable=t.enable;
+		freq=t.freq;
+		tick=t.tick;
+		mdbs_buf=t.mdbs_buf;
+		mdbs_buf.buf=(u16*)task_buf;
+		need_update_UI=t.need_update_UI;
 	}
 	string name=""; //寄存器名称
 	int enable=0; //是否有效
@@ -96,7 +107,6 @@ public:
 			mdbs_buf.num=v["num"].asInt();
 			freq=v["fre"].asDouble();
 			mdbs_buf.addr=v["addr"].asInt();
-			mdbs_buf.buf=(u16*)task_buf;
 			mdbs_buf.err=0;
 			mdbs_buf.stat=0;
 			enable=1;
