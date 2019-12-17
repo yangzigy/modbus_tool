@@ -85,7 +85,7 @@ void MainWindow::ui_initial()
 	ui->le_num->setValidator(validator);
 	validator=new QIntValidator(0,65535,this);
 	ui->le_reg->setValidator(validator);
-	ui->le_06_val->setValidator(validator);
+	//ui->le_06_val->setValidator(validator); //06需要有hex
 }
 void MainWindow::timerEvent(QTimerEvent *event) //100Hz
 {
@@ -579,7 +579,13 @@ void MainWindow::on_bt_send_clicked() //单次发送
 	if(single_task.mdbs_buf.type==6) //若写单
 	{
 		bool b;
-		single_task.mdbs_buf.buf[0]=ui->le_06_val->text().toInt(&b,16);
+		u16 t=ui->le_06_val->text().toInt(&b,16);
+		if(b) single_task.mdbs_buf.buf[0]=t;
+		else
+		{
+			QMessageBox::information(this,"错误","数据非16进制");
+			return ;
+		}
 	}
 	else if(single_task.mdbs_buf.type==0x10) //若写多
 	{
