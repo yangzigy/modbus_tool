@@ -41,10 +41,11 @@ void MainWindow::ui_initial()
 	regs_create_UI();
 	tasks_create_UI();
 
-	chart0 = new QChart();
+//	chart0 = new QChart();
+	chartView0 = new MQChartView();
+	chart0=chartView0->chart0;
 	QMargins tmpmarg(0,0,0,0);
 	chart0->setMargins(tmpmarg);
-	chartView0 = new QChartView(chart0);
 	chartView0->setRubberBand(QChartView::RectangleRubberBand);
 	ui->gridLayout_8->addWidget(chartView0,0,0);
 
@@ -478,6 +479,7 @@ void MainWindow::on_bt_open_uart_clicked()
 }
 void MainWindow::on_bt_clear_data_clicked() //清除数据
 {
+	ui->te_comm_log->str_buf=""; //清除累积数据，防止增加数据时再出来
 	ui->te_comm_log->clear();
 	curv_map.clear();
 	chart0->removeAllSeries(); //去掉所有曲线

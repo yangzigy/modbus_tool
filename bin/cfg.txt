@@ -5,7 +5,7 @@
          "d_k" : 1,
          "d_off" : 0,
          "is_curv" : 1,
-         "name" : "温度",
+         "name" : "显示浓度",
          "reg" : 1
       },
       {
@@ -13,26 +13,58 @@
          "d_k" : 1,
          "d_off" : 0,
          "is_curv" : 1,
-         "name" : "湿度",
-         "reg" : 0
+         "name" : "信号强度",
+         "reg" : 2
+      },
+      {
+         "addr" : 1,
+         "d_k" : 1,
+         "d_off" : 0,
+         "is_curv" : 0,
+         "name" : "校准",
+         "reg" : 4
+      },
+      {
+         "addr" : 1,
+         "d_k" : 1,
+         "d_off" : 0,
+         "is_curv" : 0,
+         "name" : "绿光",
+         "reg" : 6
+      },
+      {
+         "addr" : 1,
+         "d_k" : 1,
+         "d_off" : 0,
+         "is_curv" : 0,
+         "name" : "恢复出厂校准",
+         "reg" : 7
+      },
+      {
+         "addr" : 1,
+         "d_k" : 1,
+         "d_off" : 0,
+         "is_curv" : 0,
+         "name" : "测量开关",
+         "reg" : 10
+      },
+      {
+         "addr" : 1,
+         "d_k" : 1,
+         "d_off" : 0,
+         "is_curv" : 0,
+         "name" : "测量速度",
+         "reg" : 11
       }
    ],
    "tasklist" : [
       {
          "addr" : 1,
-         "fre" : 0.5,
-         "name" : "温度",
-         "num" : 2,
-         "reg" : 0,
-         "type" : 3
-      },
-      {
-         "addr" : 1,
          "fre" : 1,
-         "name" : "湿度",
-         "num" : 1,
-         "reg" : 0,
-         "type" : 4
+         "name" : "测量值",
+         "num" : 2,
+         "reg" : 1,
+         "type" : 3
       }
    ]
 }

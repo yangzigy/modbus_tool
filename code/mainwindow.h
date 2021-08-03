@@ -15,6 +15,7 @@
 #include "json.h"
 #include "common.h"
 #include "appflow.h"
+#include "mqchart.h"
 
 extern Json::Value config; //配置对象
 extern CModbus_Master md_master;
@@ -57,7 +58,7 @@ public:
 ////////////////////////////////////////////////////////////////
 // 曲线
 ////////////////////////////////////////////////////////////////
-	QChartView *chartView0;
+	MQChartView *chartView0;
 	QChart *chart0;
 	map<int,QLineSeries *> curv_map; //曲线列表
 	u32 max_curv_len=1000;

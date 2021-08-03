@@ -44,7 +44,8 @@ HEADERS += \
     ./src/common.h \
     ./src/json.h \
     ./src/modbus.h \
-    ./src/main.h \ 
+    ./src/main.h \
+    mqchart.h \
     colorlog.h \
     src/hexstr.h \
     src/queue_cpp.h
