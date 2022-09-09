@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="windows-1252"?>
 <>
   <InputFile>C:\cur\s08modbus_tool\bin\modbus_tool.exe</InputFile>
-  <OutputFile>C:\cur\s08modbus_tool\modbus_tool_boxed.exe</OutputFile>
+  <OutputFile>C:\cur\s08modbus_tool\modbus_tool_V0.4.exe</OutputFile>
   <Files>
     <Enabled>True</Enabled>
     <DeleteExtractedOnExit>False</DeleteExtractedOnExit>
