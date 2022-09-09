@@ -89,6 +89,7 @@ private slots:
 	void on_bt_clear_data_clicked();
 	void on_bt_del_reg_clicked();
 	void on_bt_import_cfg_clicked();
+	void on_bt_refresh_uart_clicked();
 };
 
 #endif // MAINWINDOW_H

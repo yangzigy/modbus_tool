@@ -15,10 +15,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
 	ui->setupUi(this);
 
-	foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts())
-	{
-		ui->cb_uart->addItem(info.portName());
-	}
+	on_bt_refresh_uart_clicked(); //刷新串口列表
 	for(auto &it:com_baud_tab)
 	{
 		ui->cb_baud->addItem(QString().sprintf("%d",it));
@@ -460,7 +457,15 @@ void MainWindow::tasks_update_data(void) //从界面更新数据：任务列表
 /////////////////////////////////////////////////////////////////////////
 //					界面响应
 ////////////////////////////////////////////////////////////////////////////
-void MainWindow::on_bt_open_uart_clicked()
+void MainWindow::on_bt_refresh_uart_clicked() //刷新串口列表
+{
+	ui->cb_uart->clear();
+	foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts())
+	{
+		ui->cb_uart->addItem(info.portName());
+	}
+}
+void MainWindow::on_bt_open_uart_clicked() //开关串口
 {
 	if(ui->bt_open_uart->text()=="打开串口")
 	{
@@ -729,4 +734,3 @@ void MainWindow::reg_create_slavelist(void) //从UI创建从模式的寄存器�
 	}
 	slave_md.reg(pt,regs_list.size());
 }
-

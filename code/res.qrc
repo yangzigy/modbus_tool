@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file>help.html</file>
-        <file>img/main_ui.jpg</file>
+        <file>../pic/V0.2.jpg</file>
+        <file>img/refresh_on.jpg</file>
     </qresource>
 </RCC>

@@ -17,7 +17,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>modbus tool V0.3</string>
+   <string>modbus tool V0.4</string>
   </property>
   <property name="styleSheet">
    <string notr="true">*{font: 14px;}</string>
@@ -316,24 +316,10 @@
              <property name="spacing">
               <number>2</number>
              </property>
-             <item row="0" column="0">
-              <widget class="QLabel" name="label_5">
-               <property name="text">
-                <string>工作模式：</string>
-               </property>
-              </widget>
-             </item>
              <item row="0" column="2">
               <widget class="QRadioButton" name="rb_wmod_slave">
                <property name="text">
                 <string>slave</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="3">
-              <widget class="QLabel" name="label_8">
-               <property name="text">
-                <string>地址：</string>
                </property>
               </widget>
              </item>
@@ -347,10 +333,38 @@
                </property>
               </widget>
              </item>
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_5">
+               <property name="text">
+                <string>模式：</string>
+               </property>
+              </widget>
+             </item>
              <item row="0" column="4">
               <widget class="QLineEdit" name="le_slave_addr">
                <property name="text">
                 <string>1</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="3">
+              <widget class="QLabel" name="label_8">
+               <property name="text">
+                <string>地址：</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="5">
+              <widget class="QPushButton" name="bt_refresh_uart">
+               <property name="toolTip">
+                <string>刷新串口</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="res.qrc">
+                 <normaloff>:/img/refresh_on.jpg</normaloff>:/img/refresh_on.jpg</iconset>
                </property>
               </widget>
              </item>
@@ -644,6 +658,8 @@ font: 75 14pt &quot;Microsoft JhengHei UI&quot;;</string>
    <header location="global">colorlog.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="res.qrc"/>
+ </resources>
  <connections/>
 </ui>
