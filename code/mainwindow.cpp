@@ -91,7 +91,7 @@ void MainWindow::timerEvent(QTimerEvent *event) //100Hz
 	{
 		task_poll();
 		static u32 tick=0;
-		if(tick++%30==1)
+		if(tick++%30==1) //3Hz
 		{
 			regs_update_UI(); //首先看看有没有要更新UI的，然后看是否有UI指令
 			regs_update_data(); //将UI数据更新到数据
@@ -201,7 +201,7 @@ void MainWindow::slot_update_a_reg(u8 addr,u16 reg,u16 d) //更新一个寄存�
 /////////////////////////////////////////////////////////////////////////
 //					数据刷新
 ////////////////////////////////////////////////////////////////////////////
-void MainWindow::regs_update_UI_row(int row) //刷新界面：寄存器
+void MainWindow::regs_update_UI_row(int row) //刷新界面：寄存器中的一行
 {
 	ui->tw_regs->item(row, 0)->setText(regs_list[row].name.c_str());
 	ui->tw_regs->item(row, 1)->setText(QString().sprintf("%04X",regs_list[row].dbuf));
@@ -212,8 +212,9 @@ void MainWindow::regs_update_UI_row(int row) //刷新界面：寄存器
 	ui->tw_regs->item(row, 6)->setText(QString().sprintf("%.2f",regs_list[row].d_k));
 	ui->tw_regs->item(row, 7)->setText(QString().sprintf("%.2f",regs_list[row].d_off));
 }
-void MainWindow::regs_update_UI(void) //刷新界面：寄存器，看标志是否需要刷新
+void MainWindow::regs_update_UI(void) //刷新界面：寄存器，看标志是否需要刷新（3Hz）
 {
+	//首先遍历寄存器数据，看哪个需要显示，调用单行刷新
 	for(int i=0;i<regs_list.size();i++)
 	{
 		if(regs_list[i].need_update_UI)
@@ -222,13 +223,13 @@ void MainWindow::regs_update_UI(void) //刷新界面：寄存器，看标志是�
 			regs_list[i].need_update_UI=0;
 		}
 	}
-	//在这里刷新曲线的范围
+	//自适应曲线显示范围
 	if(is_auto_fitscreen)
 	{
 		auto cs=chart0->series();
 		if(cs.size()>0)
 		{
-			int xmin=0xffffffff,xmax=10000; //时间长度
+			int xmin=0x7fffffff,xmax=10000; //时间长度
 			float ymin=0,ymax=10; //数据长度
 			for(int i=0;i<cs.size();i++) //每一条线
 			{
@@ -280,7 +281,7 @@ void MainWindow::regs_create_UI(void) //从数据更新界面：寄存器列表
 	}
 	reg_create_slavelist(); //更新slave的注册寄存器
 }
-void MainWindow::regs_update_data(void) //从界面更新数据：寄存器列表
+void MainWindow::regs_update_data(void) //从界面更新数据：寄存器列表（3Hz）
 {
 	int row=ui->tw_regs->rowCount();
 	for(int i=0;i<row;i++) //对于每一行
@@ -346,7 +347,7 @@ void MainWindow::regs_update_data(void) //从界面更新数据：寄存器列�
 			curv_map.erase(s_no);
 		}
 	}
-	//反向查找曲线
+	//反向查找曲线，遍历所有曲线，若没有这个寄存器，就删除
 	for(auto &it:curv_map)
 	{
 		int i;
@@ -368,7 +369,7 @@ void MainWindow::regs_update_data(void) //从界面更新数据：寄存器列�
 	}
 }
 /////////////////////////////////////////////////////////////////////////
-string get_task_stat_str(MODBUS_ADDR_LIST &task)
+string get_task_stat_str(MODBUS_ADDR_LIST &task) //工具函数：获得任务状态字符串
 {
 	const char *ttab[]={"待执行","发送中","正确","超时","错误"};
 	u8 stat=task.stat;
@@ -377,8 +378,11 @@ string get_task_stat_str(MODBUS_ADDR_LIST &task)
 	else s=ttab[stat];
 	return s;
 }
-void MainWindow::tasks_update_UI_row(int row) //刷新界面：任务
+void MainWindow::tasks_update_UI_row(int row) //刷新界面：任务中的一行
 {
+	//把数据放入表格
+	//	输入源为：task_list列表
+	//	表格访问：ui->tw_tasks->item(row, x)
 	ui->tw_tasks->item(row, 0)->setCheckState(task_list[row].enable?Qt::Checked : Qt::Unchecked);
 	ui->tw_tasks->item(row, 1)->setText(task_list[row].name.c_str());
 	ui->tw_tasks->item(row, 2)->setText(QString().sprintf("%d",task_list[row].mdbs_buf.addr));
@@ -399,6 +403,7 @@ void MainWindow::tasks_update_UI(void) //刷新界面：任务
 		ui->tw_tasks->item(i, 7)->setText(s.c_str());
 	}
 }
+//初始化、添加、删除等任务变化时调用
 void MainWindow::tasks_create_UI(void) //从数据更新界面：任务列表
 {
 	ui->tw_tasks->clear();
@@ -419,6 +424,7 @@ void MainWindow::tasks_create_UI(void) //从数据更新界面：任务列表
 	//tasktype_list.append("10");
 	tasktype_list.append("03");
 	tasktype_list.append("04");
+	//为这表格建立每一个行的列对象
 	for(int i=0;i<task_list.size();i++) //遍历所有任务
 	{
 		QTableWidgetItem *item;
@@ -434,10 +440,10 @@ void MainWindow::tasks_create_UI(void) //从数据更新界面：任务列表
 		item = new QTableWidgetItem(); ui->tw_tasks->setItem(i, 7, item);
 		item->setFlags(item->flags() & (~(1<<1))); //最后一项不可编辑
 
-		tasks_update_UI_row(i);
+		tasks_update_UI_row(i); //刷新这一行的数据
 	}
 }
-void MainWindow::tasks_update_data(void) //从界面更新数据：任务列表
+void MainWindow::tasks_update_data(void) //从界面更新数据：任务列表（3Hz调用）
 {
 	int row=ui->tw_tasks->rowCount();
 	for(int i=0;i<row;i++) //对于每一行

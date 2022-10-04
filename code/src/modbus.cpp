@@ -59,15 +59,9 @@ s64 CModbus_Master::pre_pack_len(u8 *b,s64 len)//返回整包长度
 s64 CModbus_Master::pro_pack(u8 *p,s64 len)  //主机接收处理
 {
 	u16 crc=0;
-	if(len<5) //长度错误
-	{
-		return 1;
-	}
+	if(len<5) return 1; //长度错误
 	crc=GetModbusCRC16(p,len-2);
-	if(crc!=*(u16*)(p+len-2))
-	{
-		return 1;
-	}
+	if(crc!=*(u16*)(p+len-2)) return 1;
 	if(cur_task==0 || p[0]!=cur_task->addr) return 0;//若没有任务，纯接收，则不收
 	if(p[1] & 0x80) //若是错误
 	{
@@ -76,7 +70,7 @@ s64 CModbus_Master::pro_pack(u8 *p,s64 len)  //主机接收处理
 	}
 	else if(p[1]==4 || p[1]==3) //读输入
 	{
-		if(p[2]!=CHANGE_END16(TP.num)*2)
+		if(p[2]!=CHANGE_END16(TP.num)*2) //与发送缓存的数量对比，不同就忽略
 		{
 			return 0;
 		}
@@ -192,23 +186,17 @@ s64 CModbus_Slave::pro_pack(u8 * p,s64 len) //从机接收处理
 	u8 err=0;
 	u16 crc=0;
 	u8 send_len=0; //发送字节数
-	if(len<8) //长度错误
-	{
-		return 1;
-	}
+	if(len<8) return 1; //长度错误
 	crc=GetModbusCRC16(p,len-2);
-	if(crc!=*(u16*)(p+len-2))
-	{
-		return 1;
-	}
-	if(PACK.addr!=0&&PACK.addr!=address)
-		return 0;
+	if(crc!=*(u16*)(p+len-2)) return 1; //校验错误
+	if(PACK.addr!=0 && PACK.addr!=address) return 0; //地址校验
+//分指令处理
 	if(p[1]==4 || p[1]==3) //读输入
 	{
 		u16 start=((u16*)p)[1]; //起始地址
 		u8 n=p[5]; //参数个数
 		start=CHANGE_END16(start);
-		if(n>MAX_REG_NUM)
+		if(n>MAX_REG_NUM) //参数个数超最大值
 		{
 			err=1;
 			n=0;

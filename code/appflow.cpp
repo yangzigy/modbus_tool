@@ -43,7 +43,8 @@ void mdbs_rxcb_slave(u8 *p,int n)//接收回调函数
 	if(p[1]==6)
 	{
 		u16 reg=(*(MODBUS_RTU_REQ*)p).st;
-		u16 d=(*(MODBUS_RTU_REQ*)p).num;
+		u16 d=(*(MODBUS_RTU_REQ*)p).num; //需要换端后再用
+		reg=CHANGE_END16(reg);
 		d=CHANGE_END16(d);
 		update_a_reg(p[0],reg,d);
 	}
@@ -51,7 +52,8 @@ void mdbs_rxcb_slave(u8 *p,int n)//接收回调函数
 	{
 		int i;
 		u16 reg=(*(MODBUS_RTU_REQ*)p).st;
-		u16 num=(*(MODBUS_RTU_REQ*)p).num;
+		u16 num=(*(MODBUS_RTU_REQ*)p).num; //需要换端后再用
+		reg=CHANGE_END16(reg);
 		num=CHANGE_END16(num);
 		for(i=0;i<num;i++)
 		{
