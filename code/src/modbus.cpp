@@ -35,7 +35,7 @@ void modbus_send_void(u8 *p,int n){};
 ///////////////////////////////////////////////////////////////////////////
 //				主机
 ///////////////////////////////////////////////////////////////////////////
-s64 CModbus_Master::pre_pack_len(u8 *b,s64 len)//返回整包长度
+u32 CModbus_Master::pre_pack_len(u8 *b,u32 len)//返回整包长度
 {
 	if(b[1] & 0x80)
 	{
@@ -49,14 +49,14 @@ s64 CModbus_Master::pre_pack_len(u8 *b,s64 len)//返回整包长度
 	{
 		len=8; //主从都是8
 	}
-	else if(b[1]==3 || b[1]==4) //若是写单寄存器
+	else if(b[1]==3 || b[1]==4) //若是读寄存器
 	{
 		len=b[2]+5;
 		if(len<6) len=6;
 	}
 	return len;
 }
-s64 CModbus_Master::pro_pack(u8 *p,s64 len)  //主机接收处理
+u32 CModbus_Master::pro_pack(u8 *p,u32 len)  //主机接收处理
 {
 	u16 crc=0;
 	if(len<5) return 1; //长度错误
@@ -161,7 +161,7 @@ int CModbus_Master::add_task(MODBUS_ADDR_LIST *pt) //加入一个任务
 ///////////////////////////////////////////////////////////////////////////
 //				从机
 ///////////////////////////////////////////////////////////////////////////
-s64 CModbus_Slave::pre_pack_len(u8 *b,s64 len)//返回整包长度
+u32 CModbus_Slave::pre_pack_len(u8 *b,u32 len)//返回整包长度
 {
 	if(b[0]!=address && b[0]!=0) //若不是自己该接收的
 	{
@@ -180,7 +180,7 @@ s64 CModbus_Slave::pre_pack_len(u8 *b,s64 len)//返回整包长度
 		return 8;
 	}
 }
-s64 CModbus_Slave::pro_pack(u8 * p,s64 len) //从机接收处理
+u32 CModbus_Slave::pro_pack(u8 * p,u32 len) //从机接收处理
 {
 	int i;
 	u8 err=0;

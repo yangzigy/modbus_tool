@@ -1,8 +1,8 @@
 /*
 文件名：common.cpp
-作者：北京交通大学 自控1102 杨孜
 创建时间：2014-4-16
-版本：	V1.0			2018-11-21 13:56:31
+版本：	V1.1			2019-01-15
+版本：	V1.2			2019-08-21
 
 */
 #include "common.h"
@@ -307,9 +307,8 @@ void delay(int t)
 
 /////////////////////////////////////////////////////////////////////////////////
 //2、调试与日志
-bool is_win_socket_startup=false;
 string exepath;//本可执行文件的路径
-CLogger slog;//系统的日志对象
+CLogFile slog;//系统的日志对象
 
 void start_program(void)
 {
@@ -329,14 +328,6 @@ void start_program(void)
 	tmppath=link;
 	exepath=tmppath.path;
 #endif
-}
-const char *LogLeval[]= //日志中的级别字符
-{
-	"E","I","W","D",
-};
-void com_debug_ini(string s) //系统日志对象的初始化
-{
-	slog.log_ini(s.c_str());
 }
 ///////////////////////////////////////////////////////////////////
 //3、字符扩展
@@ -399,13 +390,11 @@ string com_trim(string &s)//去除首尾空格
 	return s.substr(pos1,pos2-pos1+1);
 }
 //直接格式化成string
-string sFormat(const char *format,...)
+string sFormat(const char *format,va_list args)
 {
 	string s;
 	int char_len=10240,len;
 	char *buf=new char[char_len];
-	va_list args;
-	va_start(args,format);
 	len=vsnprintf(buf,char_len,format,args);
 	while(len<0)
 	{
@@ -422,12 +411,18 @@ string sFormat(const char *format,...)
 		buf=new char[char_len];
 		len=vsnprintf(buf,char_len,format,args);
 	}
-	va_end(args);
 	s=buf;
 	delete[] buf;
 	return s;
 }
-
+string sFormat(const char *format,...)
+{
+	va_list args;
+	va_start(args,format);
+	string s=sFormat(format,args);
+	va_end(args);
+	return s;
+}
 vector<string> com_split(string &s,const char *c)
 {
 	vector<string> out;
@@ -628,7 +623,7 @@ s64 CComFile::read_safe(void *p,u64 n)//带报错的读操作
 	}
 	return real_n;
 }
-s64 CComFile::write(void *p,u64 n)
+s64 CComFile::write(const void *p,u64 n)
 {
 	//return fwrite(p,1,n,f);
 	s64 real_n=0;//实际字节数
@@ -650,6 +645,15 @@ s64 CComFile::write(void *p,u64 n)
 		delay(100);
 	}
 	return real_n;
+}
+void CLogFile::log(const char *format,...)
+{
+	va_list args;
+	va_start(args,format);
+	string s=sFormat(format,args);
+	va_end(args);
+	
+	log(s);
 }
 //离线处理函数,将一个文件以缓冲的方式分批读入
 //并调用回调函数进行处理。回调函数中指名当前调用者的数据
@@ -695,7 +699,6 @@ void offline_pro(CComFile &file,u64 st,u64 end,u64 bufn,
 //return 0;//返回0为继续处理
 //}
 //offline_pro(file,st,end,1024*1024*4,find_cb,this);
-
 //读取文本文件
 string read_textfile(const char *filename)
 {
@@ -704,7 +707,6 @@ string read_textfile(const char *filename)
 	buffer << ifs.rdbuf();  
 	return buffer.str();
 }
-
 
 #ifdef __GNUC__
 string com_popen(const char *scmd)//打开只读管道获取命令输出
@@ -737,6 +739,8 @@ string com_popen(const char *scmd)//打开只读管道获取命令输出
 }
 #endif
 #if (!defined(WIN32) && !defined(WIN64))
+#include<sys/types.h>
+#include<sys/wait.h>
 int _system (const char *command) //不复制内存的调用方式
 {
 	int pid = 0;
@@ -775,8 +779,99 @@ int _system (const char *command) //不复制内存的调用方式
 	} while(1);
 	return 0;
 }
-#endif
+#include <dirent.h>
+void list_dir(const char *path,const char *ext,vector<string> &rst) //输入路径名带/，扩展名带. 输出文件名列表，不含全路径
+{
+	DIR* dp = nullptr;
+	struct dirent* dirp = nullptr;
+	if((dp = opendir(path)) == nullptr) return ;
 
+	while((dirp = readdir(dp)) != nullptr)
+	{
+		if(dirp->d_type == DT_REG) //若是文件
+		{
+			string s=dirp->d_name;
+			string se="";
+			int i=s.find_last_of('.'); //从后找 "."
+			if(i>=0) se=s.substr(i,s.size()-i);//".txt"
+			//cout<<s<<endl;
+			//cout<<"	"<<se<<endl;
+			if(se==ext)
+			{
+				rst.push_back(s);
+			}
+		}
+	}
+	closedir(dp);
+	return ;
+}
+#include <unistd.h> 
+#include <sys/stat.h>
+int mkdir_1(const char *dirname) //建立1级目录
+{  
+	int a = access(dirname, F_OK);
+	if(a==-1) mkdir(dirname,0755);
+	return 0;
+}
+#else
+#include <io.h>
+void list_dir(const char *path,const char *ext,vector<string> &rst) //输入路径名带/，输扩展名带. 出文件名列表，不含全路径
+{
+	string dirname=path;
+	dirname+="*";
+	dirname+=ext;
+	intptr_t handle;
+	_finddata_t findData;
+	handle = _findfirst(dirname.c_str(), &findData);    // 查找目录中的第一个文件
+	if (handle == -1) return ;
+	do
+	{
+		if (findData.attrib & _A_SUBDIR
+				&& strcmp(findData.name, ".") == 0
+				&& strcmp(findData.name, "..") == 0
+		   )    // 是否是子目录并且不为"."或".."
+		{
+			//cout << findData.name << "\t<dir>\n";
+		}
+		else
+		{
+			//cout << findData.name << "\t" << findData.size << endl;
+			rst.push_back(findData.name);
+		}
+	} while (_findnext(handle, &findData) == 0);    // 查找目录中的下一个文件
+	_findclose(handle);    // 关闭搜索句柄
+	return ;
+}
+#include <direct.h> //_mkdir函数的头文件
+int mkdir_1(const char *dirname) //建立1级目录
+{  
+	int a = access(dirname, 0);
+	if(a==-1) mkdir(dirname);
+	return 0;
+}
+#endif
+vector<string> list_dir(const char *path,const char *ext) //输入路径名带/，输出文件名列表，不含全路径
+{
+	vector<string> rst;
+	list_dir(path,ext,rst);
+	return rst;
+}
+int mkdir_p(const char *dirname) //建立多级目录  案例//mkdir_p("./c/b/");
+{
+	string s=dirname;
+	char buf[2]={PATH_CHAR,0};
+	s=com_replace(s,PATH_CHAR_OTHER,PATH_CHAR);
+	auto dirs=com_split(s,buf);
+	if(dirs.size()<=0) return 1;
+	s=dirs[0];
+	for(auto &it:dirs)
+	{
+		if(mkdir_1(s.c_str())) return 1;
+		s+=buf;
+		s+=it;
+	}
+	return 0;
+}
 ///////////////////////////////////////////////////////////////////
 //6、python扩展
 #ifdef PYEXT
@@ -806,17 +901,19 @@ int CPyExt::set_string(const char *key,const char *val) //设置变量值，适�
 	{
 		throw "";
 	}
-	//cout<<p_main_Module<<" "<<ps<<endl;
 	PyObject_SetAttrString(p_main_Module,key,ps);
+	Py_DECREF(ps);
 }
 string CPyExt::get_string(const char *key) //获取字符型变量值
 {
-	PyObject *ps=PyObject_GetAttrString(p_main_Module,key);
+	PyObject *ps=PyObject_GetAttrString(p_main_Module,key); //引用+1
 	if (!ps)
 	{
 		throw "";
 	}
-	return PyUnicode_AsUTF8(ps);
+	string r=PyUnicode_AsUTF8(ps); //返回指针，调用方不负责释放
+	Py_DECREF(ps);
+	return r;
 }
 int CPyExt::eval(const char *p) //执行脚本字符串
 {

@@ -117,8 +117,8 @@ public: //构造需要初始化队列
 	u16 timetick; //任务经过的周期数
 	CQueue<MODBUS_ADDR_LIST *> q_task; //任务队列
 	MODBUS_ADDR_LIST *cur_task; //当前任务
-	virtual s64 pre_pack_len(u8 *b,s64 len);//返回整包长度
-	virtual s64 pro_pack(u8 * b,s64 len);//返回是否正确接收
+	virtual u32 pre_pack_len(u8 *b,u32 len);//返回整包长度
+	virtual u32 pro_pack(u8 * b,u32 len);//返回是否正确接收
 	int host_send(u8 addr,u8 fun,u16 st,u16 num,u16 *d); //当发06时，num为寄存器值
 	int add_task(MODBUS_ADDR_LIST *pt); //加入一个任务
 	void poll(void); //周期函数，主机通过周期函数进行发送
@@ -137,8 +137,8 @@ public:
 	}
 	MODBUS_ADDR_LIST *addr_list; //从机地址列表
 	u32 addr_list_n; //地址列表长度
-	virtual s64 pre_pack_len(u8 *b,s64 len);//返回整包长度
-	virtual s64 pro_pack(u8 * b,s64 len);//返回是否正确接收
+	virtual u32 pre_pack_len(u8 *b,u32 len);//返回整包长度
+	virtual u32 pro_pack(u8 * b,u32 len);//返回是否正确接收
 	void reg(MODBUS_ADDR_LIST *a,u32 n); //向模块注册地址
 	u16 *get_data(u16 a); //从地址获得数据,输入小端地址
 	u8 send_err(u8 cmd,u8 err);
